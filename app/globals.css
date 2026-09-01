@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/*
+ * Placeholder minimal — étape 1 (squelette).
+ *
+ * Le système de tokens complet (clair/sombre) de l'ancien dépôt
+ * (frontend/app/globals.css) sera porté ici à l'arrivée des composants UI
+ * (button, badge, theme-provider/toggle), pas avant.
+ *
+ * C'est aussi à ce moment-là que sera tranché le sort de l'ancien
+ * `@import "shadcn/tailwind.css"` : le paquet `shadcn` est retiré des
+ * dépendances (CLI de dev détournée en lib runtime — voir docs/DECISIONS.md
+ * ADR-009). L'ancien fichier redéfinit déjà toute la surface de tokens ;
+ * à vérifier composant par composant qu'aucune primitive shadcn ne manque.
+ */
