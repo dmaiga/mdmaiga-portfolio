@@ -5,12 +5,12 @@ import { _lireFichesBrouillonsComprises } from "@/lib/realisations"
 import { _lireOffresBrouillonsCompris } from "@/lib/offres"
 
 /**
- * Garde-fou de publication : une réalisation ou une offre `brouillon: false`
- * ne doit contenir aucun marqueur d'inachèvement (`TODO —`, `[VÉRIFIER`).
+ * Garde-fou de publication : aucun contenu destiné à être publié ne doit
+ * contenir de marqueur d'inachèvement (`TODO —`, `[VÉRIFIER`).
  *
- * Les brouillons et les pages fixes (accueil / à propos / contact) en sont
- * exemptés : ils peuvent encore porter des marqueurs pendant la rédaction.
- * Voir le rapport d'étape pour la liste des `[VÉRIFIER]` en cours.
+ * Concerne : les réalisations, offres et blocs de page `brouillon: false`, et
+ * TOUTES les pages fixes (accueil / à propos / contact — pas de flag brouillon,
+ * elles sont dans la navigation). Seuls les brouillons sont exemptés.
  */
 const MARQUEURS = /TODO\s+—|\[VÉRIFIER/
 
@@ -46,6 +46,14 @@ describe("garde-fou de publication — contenu publié sans marqueur d'inachève
       if (!/brouillon:\s*true/.test(contenu)) {
         expect(contenu, `content/offres-blocs/${fichier}`).not.toMatch(MARQUEURS)
       }
+    }
+  })
+
+  it("pages fixes (accueil, à propos, contact) — toujours vérifiées", () => {
+    const dossier = join(process.cwd(), "content", "pages")
+    for (const fichier of readdirSync(dossier).filter((f) => f.endsWith(".mdx"))) {
+      const contenu = readFileSync(join(dossier, fichier), "utf8")
+      expect(contenu, `content/pages/${fichier}`).not.toMatch(MARQUEURS)
     }
   })
 })

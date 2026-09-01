@@ -62,8 +62,8 @@ validation.
   mises en avant (disparaît si aucune) / démarche / CTA — offres et réalisations lues en
   direct, jamais recopiées (ADR-016). Contact : formulaire **piloté par le contenu**
   (`contact.mdx` décrit les champs), Web3Forms, dégrade si la clé manque (ADR-017).
-  Reste 5 `[VÉRIFIER]` à confirmer avant mise en ligne (voir rapport d'étape).
-  Règles de langue du site : `rules/LANGUE.md` (ADR-018).
+  Cinq `[VÉRIFIER]` levés (valeurs définitives). Garde-fou `content-guards` actif sur
+  les pages fixes. Règles de langue du site : `rules/LANGUE.md` (ADR-018).
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
 
 ---
