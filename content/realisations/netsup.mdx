@@ -1,10 +1,7 @@
 ---
 slug: netsup
-# titre proposé dans le brief de bootstrap :
-#   "206 agents, 20 sites, un contrôle terrain enfin vérifiable"
-# laissé en TODO — à confirmer / reformuler par l'auteur.
-titre: "TODO — titre de la réalisation NETSUP"
-resume: "TODO — résumé en une à deux phrases, affiché sur les cartes de l'index."
+titre: "206 agents, 20 sites, un contrôle terrain enfin vérifiable"
+resume: "Les contrôles terrain d'une société de nettoyage reposaient sur des fiches papier, des fichiers Excel et des groupes WhatsApp. Rien n'était consolidé, et personne ne pouvait vérifier que les sites étaient réellement visités."
 type: plateforme-metier
 cadre: salarie
 secteur: "Services de nettoyage et d'entretien"
@@ -15,10 +12,10 @@ debut: 2026-04
 production_depuis: 2026-05
 fin: null
 utilisateurs: "2 superviseurs en saisie, direction en consultation"
-technologies: [Django, PostgreSQL, Tailwind]
+technologies: [Django, PostgreSQL, WhiteNoise]
 mis_en_avant: true
-brouillon: true
 ordre: 1
+brouillon: true
 lien_demo: null
 image_couverture: null
 alt_couverture: null
@@ -26,32 +23,56 @@ alt_couverture: null
 
 ## Avant
 
-TODO —
+Deux superviseurs encadrent 206 techniciens de surface répartis sur 20 sites, de 5 à 20 personnes selon le site. Chaque site doit être contrôlé deux fois par semaine : pointer les présents, vérifier l'application des règles de protection, évaluer l'état d'entretien, signaler les incidents.
+
+Tout reposait sur des fiches de présence papier, des fichiers Excel et des groupes WhatsApp. Rien n'était consolidé. La direction ne pouvait ni vérifier que les sites étaient réellement visités, ni savoir quels agents s'absentaient régulièrement, ni suivre ce qui avait été signalé sur le terrain.
 
 ## Ce qui a été mis en place
 
-TODO —
+Une application web, utilisable depuis un téléphone, sur laquelle les superviseurs saisissent directement leurs contrôles pendant la visite.
+
+- **Pointage individuel** de chaque technicien : présent, absent, avec le motif — retard, congé, maladie, absence prévenue ou non
+- **Preuve de contrôle** : chaque visite est horodatée, avec identification du site, photo de la fiche de présence et localisation
+- **Suivi du quota** de deux visites hebdomadaires : les sites apparaissent conformes, partiellement couverts ou non visités
+- **Contrôle qualité et sécurité** : état d'entretien du site, respect des règles de protection, signalement des incidents avec suivi jusqu'à résolution
+- **Restitution pour la direction** : indicateurs de présence par site, par agent et par période, identification des absences récurrentes, rapports filtrables par site, encadrant, période et niveau de qualité
 
 ## Aujourd'hui
 
-TODO —
+En service depuis mai 2026. Six semaines entre le début de la mission et la mise en production.
+
+Les deux superviseurs saisissent leurs contrôles sur le terrain, la direction consulte sans avoir à réclamer quoi que ce soit.
+
+Le premier apport n'a pas été celui qu'on attendait. Les données ont confirmé que les superviseurs couvraient bien leurs sites. Ce qu'elles ont fait remonter, en revanche, ce sont des manquements de sécurité jusque-là invisibles : équipements de protection non portés, règles négligées sur certains sites. Sur un effectif de 206 personnes, ce risque-là n'était mesuré nulle part.
+
+Une extension au volet RH — contrats, congés, absences — est cadrée pour début 2027.
 
 <Approfondir>
 
 ### Choix de conception
 
-TODO —
+**Web responsive avant application mobile.** Le besoin appelait naturellement une application mobile. Elle n'a pas été construite en premier. Une application web responsive a été mise en production d'abord, pour valider l'usage réel et la pertinence du dispositif avant d'engager le budget d'un développement mobile. La décision de passer au mobile se prendra sur des données d'usage, pas sur une intuition.
+
+**Périmètre d'accès volontairement restreint.** Les techniciens n'ont pas accès à l'application. Ouvrir la saisie à 206 personnes aurait imposé une gestion de comptes, une formation de masse et un risque d'adoption élevé, pour un gain nul : ce sont les superviseurs qui produisent la donnée de contrôle. Trois profils suffisent — superviseur en saisie, direction en consultation, administration.
 
 ### Modèle de données
 
-TODO —
+Sites, affectations des techniciens par site, visites de contrôle, pointages individuels rattachés à une visite, incidents rattachés à un site avec cycle de résolution.
 
-### Technique
+Le pointage est un fait daté rattaché à un contrôle horodaté, jamais un état modifiable — ce qui rend l'historique opposable.
 
-TODO —
+### Traçabilité et preuve
+
+Chaque contrôle porte son horodatage, sa localisation et une photo de la fiche de présence papier correspondante. La photo n'est pas décorative : elle permet la réconciliation avec le document signé sur site, qui reste la pièce de référence en cas de litige.
+
+### Contrôle d'accès
+
+Cloisonnement par rôle : un superviseur ne voit que ses sites et ses techniciens ; la direction voit l'ensemble en consultation.
 
 ### Retour d'expérience
 
-TODO —
+L'hébergement mutualisé était le bon choix pour une première version à faible volumétrie et budget contraint, mais il plafonne : pas d'intégration continue, sauvegardes à automatiser, montée en charge limitée. C'est le premier chantier à traiter si le volet RH est engagé en 2027, avant d'ajouter des données de contrat et de paie au périmètre.
+
+L'adoption par les superviseurs s'est faite sans résistance exprimée. Reste à mesurer, sur les prochains mois, si l'usage est effectivement complet ou si certaines saisies sont faites en fin de semaine plutôt que pendant la visite — l'horodatage permet précisément de le vérifier.
 
 </Approfondir>
