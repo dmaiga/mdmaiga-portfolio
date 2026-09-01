@@ -91,6 +91,16 @@ API publique (toutes filtrent les brouillons, sauf la première) :
 Le paramètre `dossier` optionnel de ces fonctions est un point d'entrée de test
 (fixtures) ; le code applicatif les appelle sans argument.
 
+### Rendu (composants)
+
+| Composant | Rôle |
+|---|---|
+| `components/contenu-mdx.tsx` | compile le corps MDX (`next-mdx-remote/rsc` + `remark-gfm`) au build, mappe `<Approfondir>` et les éléments de base |
+| `components/approfondir.tsx` | `<details>`/`<summary>` natif : replié sans JS, clavier, annoncé par lecteur d'écran, contenu conservé dans le DOM (indexable) |
+| `components/realisations-browser.tsx` | filtre `type` côté client ; état initial « tout » → le HTML statique liste déjà toutes les fiches (ADR-012) |
+| `components/realisation-carte.tsx` | carte d'index ; tolère `image_couverture: null` et `technologies: []` |
+| `lib/affichage.ts` | helpers purs testés (`formatPeriode`, `technologiesAffichees`, …) — aucun libellé orphelin quand un champ optionnel manque |
+
 ## 4. Taxonomie
 
 Source **unique** : `lib/taxonomie.ts`. Aucune recopie ailleurs, y compris dans la

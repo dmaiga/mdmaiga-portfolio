@@ -1,15 +1,153 @@
 @import "tailwindcss";
 
 /*
- * Placeholder minimal — étape 1 (squelette).
+ * Système de tokens porté de l'ancien dépôt (frontend/app/globals.css) à
+ * l'arrivée des premiers composants (étape 3). Deux imports de l'original
+ * volontairement retirés :
+ *   - `@import "shadcn/tailwind.css"` : paquet `shadcn` non installé (ADR-009) ;
+ *     ce fichier redéfinit déjà toute la surface de tokens ci-dessous.
+ *   - `@import "tw-animate-css"` : paquet différé jusqu'au travail d'animation
+ *     (phase 2). Aucune classe `animate-*` n'est utilisée pour l'instant.
  *
- * Le système de tokens complet (clair/sombre) de l'ancien dépôt
- * (frontend/app/globals.css) sera porté ici à l'arrivée des composants UI
- * (button, badge, theme-provider/toggle), pas avant.
- *
- * C'est aussi à ce moment-là que sera tranché le sort de l'ancien
- * `@import "shadcn/tailwind.css"` : le paquet `shadcn` est retiré des
- * dépendances (CLI de dev détournée en lib runtime — voir docs/DECISIONS.md
- * ADR-009). L'ancien fichier redéfinit déjà toute la surface de tokens ;
- * à vérifier composant par composant qu'aucune primitive shadcn ne manque.
+ * Source de vérité de l'identité visuelle : à documenter en phase 2.
  */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-cyan: var(--cyan);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* --font-inter est fourni par next/font/local une fois les .woff2 en place
+     (ADR-007). Tant qu'il est absent, le repli système ci-dessous s'applique. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* ── Tokens sémantiques — clair ──
+     Palette : 80 % neutres cool-gray · 15 % bleu profond · 5 % cyan.
+     Contraste texte/fond ≥ WCAG AA. */
+  --bg: oklch(0.965 0.003 255);
+  --surface: oklch(0.99 0.003 255);
+  --edge: oklch(0.9 0.005 255);
+  --text: oklch(0.23 0.012 260);
+  --text-muted: oklch(0.45 0.012 260);
+  --brand: oklch(0.48 0.16 258);
+  --brand-foreground: oklch(0.985 0.005 255);
+  --cyan: oklch(0.68 0.12 205);
+
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: oklch(0.945 0.004 255);
+  --secondary-foreground: var(--text);
+  --muted: oklch(0.945 0.004 255);
+  --muted-foreground: var(--text-muted);
+  --accent: oklch(0.93 0.028 205);
+  --accent-foreground: var(--brand);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--edge);
+  --input: var(--edge);
+  --ring: var(--brand);
+  --radius: 0.625rem;
+}
+
+.dark {
+  /* ── Tokens sémantiques — sombre ──
+     Fond near-black navy, texte blanc cassé, bleu/cyan légèrement désaturés. */
+  --bg: oklch(0.165 0.012 260);
+  --surface: oklch(0.205 0.013 260);
+  --edge: oklch(1 0 0 / 12%);
+  --text: oklch(0.97 0.003 255);
+  --text-muted: oklch(0.71 0.008 258);
+  --brand: oklch(0.7 0.14 260);
+  --brand-foreground: oklch(0.16 0.02 260);
+  --cyan: oklch(0.78 0.105 200);
+
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: oklch(0.255 0.01 260);
+  --secondary-foreground: var(--text);
+  --muted: oklch(0.255 0.01 260);
+  --muted-foreground: var(--text-muted);
+  --accent: oklch(0.27 0.05 205);
+  --accent-foreground: oklch(0.8 0.11 200);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: var(--edge);
+  --input: oklch(1 0 0 / 16%);
+  --ring: var(--brand);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans scroll-smooth;
+    font-optical-sizing: auto;
+  }
+  body {
+    @apply bg-background text-foreground leading-relaxed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

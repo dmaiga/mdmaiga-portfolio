@@ -36,7 +36,8 @@ export const frontmatterSchema = z
     production_depuis: moisAnnee.nullable(),
     fin: moisAnnee.nullable(),
     utilisateurs: z.string().min(1),
-    technologies: z.array(z.string().min(1)).min(1, "au moins une technologie"),
+    // Peut être vide : plusieurs fiches à venir n'exposent aucune techno.
+    technologies: z.array(z.string().min(1)),
     mis_en_avant: z.boolean(),
     brouillon: z.boolean(),
     ordre: z.number().int(),

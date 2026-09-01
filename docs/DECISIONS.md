@@ -120,3 +120,43 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   dupliquer le déploiement dans Actions n'apporterait rien.
 - **Alternatives écartées.** Déploiement piloté par Actions (`vercel deploy`) :
   redondant avec l'intégration Git de Vercel, une source de vérité en plus à tenir.
+
+## ADR-011 — Rendu MDX : `next-mdx-remote/rsc`
+*2026-09-01 · Acté*
+- **Décision.** Compiler le corps MDX des fiches avec `next-mdx-remote/rsc` +
+  `remark-gfm`, dans un composant serveur. La page `[slug]` étant générée via
+  `generateStaticParams`, la compilation a lieu au build — aucun runtime serveur.
+- **Pourquoi.** Le contenu vit dans `content/`, hors `app/` : `@next/mdx` (qui mappe
+  des fichiers sous `app/`) ne convient pas. `next-mdx-remote/rsc` prend une source
+  brute et un mapping de composants (`<Approfondir>`), ce qu'il nous faut.
+- **Alternatives écartées.** `@next/mdx` (mauvais emplacement) ; `@mdx-js/mdx` à la
+  main (recompose ce que la lib fait déjà). Coloration syntaxique : hors sujet, les
+  fiches ne contiennent aucun bloc de code.
+
+## ADR-012 — Filtre de l'index côté client, dégradation par l'état initial
+*2026-09-01 · Acté*
+- **Décision.** Le filtre par `type` de `/realisations` est un composant client dont
+  l'état initial est « tout ». La page (serveur) rend d'abord la liste complète des
+  fiches publiées ; le composant est rendu au build avec cet état, donc le HTML
+  statique contient déjà toutes les cartes.
+- **Pourquoi.** Sans JavaScript ou avant hydratation, le visiteur voit la liste
+  complète — jamais une liste vide. Le JavaScript n'ajoute qu'un tri visuel.
+  Garde la page 100 % statique (pas de `searchParams`, qui la rendrait dynamique).
+- **Alternatives écartées.** Filtre serveur via `searchParams` : bascule la page en
+  rendu dynamique, contradiction avec ADR-003. Liens `?type=` pré-rendus : multiplie
+  les routes pour un bénéfice nul ici.
+- **Conséquence.** Les libellés de pastilles sont lus depuis `lib/taxonomie.ts` ;
+  seuls les `type` réellement présents dans les fiches produisent une pastille.
+
+## ADR-013 — Champs optionnels du frontmatter : `null` / `[]`, jamais absents
+*2026-09-01 · Acté*
+- **Décision.** `production_depuis`, `fin`, `lien_demo`, `image_couverture` valent
+  explicitement `null` quand ils ne s'appliquent pas ; `technologies` vaut `[]`.
+  Les clés restent présentes dans chaque fiche. `technologies` peut être vide
+  (plusieurs fiches à venir n'exposent aucune techno).
+- **Pourquoi.** Un frontmatter à clés stables se relit et se valide plus simplement
+  qu'un frontmatter à clés variables. Le rendu (fiche, carte) teste `null` / longueur
+  et n'affiche ni section vide ni libellé orphelin — vérifié par `affichage.test.ts`
+  et un rendu de contrôle au build.
+- **Alternatives écartées.** Clés omises + `z.optional()` : rend le gabarit de fiche
+  truffé de `?.` et le modèle de contenu moins lisible pour l'auteur.

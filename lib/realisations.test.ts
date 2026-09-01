@@ -72,6 +72,31 @@ describe("validation du frontmatter", () => {
     )
   })
 
+  it("accepte une liste de technologies vide (fiche sans techno exposée)", () => {
+    const base = {
+      slug: "x",
+      titre: "T",
+      resume: "R",
+      type: "laboratoire",
+      cadre: "academique",
+      secteur: "S",
+      client: "C",
+      client_anonymise: true,
+      role: "Rôle",
+      debut: "2026-01",
+      production_depuis: null,
+      fin: null,
+      utilisateurs: "U",
+      technologies: [],
+      mis_en_avant: false,
+      brouillon: false,
+      ordre: 1,
+      lien_demo: null,
+      image_couverture: null,
+    }
+    expect(frontmatterSchema.safeParse(base).success).toBe(true)
+  })
+
   it("schéma strict : une clé inconnue est refusée", () => {
     const res = frontmatterSchema.safeParse({ champ_en_trop: 1 })
     expect(res.success).toBe(false)

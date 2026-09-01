@@ -28,18 +28,28 @@ par Vercel.
 
 ## UI
 
-* **next-themes** — thème clair/sombre sans flash ni bug d'hydratation sous App Router.
-* **class-variance-authority**, **clsx**, **tailwind-merge** — variantes de composants et `cn()`.
+Chaque dépendance est installée **au moment où elle sert**, jamais en avance.
+
+Installées :
+
+* **clsx**, **tailwind-merge** — fonction `cn()` (`lib/utils.ts`).
+
+Prévues, encore non installées :
+
+* **next-themes** — thème clair/sombre sans flash ni bug d'hydratation (à l'arrivée du bascule de thème).
+* **class-variance-authority** — variantes des composants `button` / `badge`.
 * **lucide-react** — icônes.
-* **tw-animate-css** — utilitaires d'animation (importé par `globals.css`).
-* Composants `button` / `badge` : **code possédé**, copiés depuis l'ancien dépôt, pas une dépendance.
+* **tw-animate-css** — utilitaires d'animation (phase 2).
+
+Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépôt, pas une dépendance.
 
 ## Chaîne de contenu
 
-* **next-mdx-remote** (variante RSC) — compilation + rendu du MDX au build.
 * **gray-matter** — extraction du frontmatter.
-* **zod** — validation stricte du frontmatter ; **échec de build** si invalide.
+* **zod** (v3) — validation stricte (`.strict()`) du frontmatter ; **échec de build** si invalide.
+* **next-mdx-remote** (`/rsc`) — compilation + rendu du MDX au build.
 * **remark-gfm** — tableaux / listes GFM dans le MDX.
+* Pas de coloration syntaxique (`shiki`, `rehype-pretty-code`) : les fiches ne contiennent aucun bloc de code.
 
 ## Polices
 
@@ -53,12 +63,14 @@ par Vercel.
 
 ## Tests
 
-* **Vitest**, périmètre **strictement limité** à deux cibles :
-  1. la validation du schéma de frontmatter (zod) ;
-  2. le filtre `brouillon` — une fiche en brouillon n'apparaît ni dans l'index, ni sur
-     l'accueil, ni dans le sitemap, ni comme route générée.
-* Le second test est le garde-fou principal du projet (saisie progressive de ~9 fiches).
-  Rien d'autre à tester à ce stade.
+* **Vitest** (`environment: node`, `renderToStaticMarkup` pour le rendu). Périmètre **resserré** :
+  1. **filtre `brouillon`** — garde-fou central : une fiche brouillon n'apparaît ni dans
+     l'index, ni sur l'accueil, ni dans le sitemap, ni comme route générée ;
+  2. validation du schéma de frontmatter (zod, schéma strict, `slug` == nom de fichier) ;
+  3. dégradation du filtre d'index (le HTML statique liste toutes les fiches) ;
+  4. `<Approfondir>` replié par défaut et contenu présent dans le HTML ;
+  5. helpers d'affichage des champs optionnels (`lib/affichage.ts`).
+* Pas de tests au-delà : pas de rendu pixel, pas de e2e.
 
 ## Intégration continue
 

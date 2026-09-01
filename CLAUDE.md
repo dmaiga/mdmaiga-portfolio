@@ -39,8 +39,12 @@ validation.
   (`lib/frontmatter.ts`), taxonomie source unique (`lib/taxonomie.ts`), filtre brouillon + tri,
   fiche modèle `content/realisations/exemple-modele.mdx` (`brouillon: true`), tests Vitest
   (`lib/realisations.test.ts`) — le filtre brouillon est le garde-fou central (ADR-005).
-- Étape 3 — Réalisations (index filtrable + gabarit de fiche, bloc `<Approfondir>`,
-  compilation MDX via `next-mdx-remote` + `remark-gfm`).
+- **Étape 3 — Réalisations.** ✅ index filtrable par `type` (`components/realisations-browser.tsx`,
+  filtre client qui dégrade proprement — ADR-012), gabarit de fiche `/realisations/[slug]`
+  (`generateStaticParams`, champs optionnels tolérés — ADR-013), `<Approfondir>` en `<details>`
+  natif (`components/approfondir.tsx`), rendu MDX via `next-mdx-remote/rsc` + `remark-gfm`
+  (ADR-011), système de tokens `globals.css` porté. Tests : dégradation, `<Approfondir>`
+  replié + indexable, chaîne MDX, helpers d'affichage.
 - Étape 4 — Offres (gabarit répété trois fois).
 - Étape 5 — Accueil, à propos, contact.
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
