@@ -45,7 +45,12 @@ validation.
   natif (`components/approfondir.tsx`), rendu MDX via `next-mdx-remote/rsc` + `remark-gfm`
   (ADR-011), système de tokens `globals.css` porté. Tests : dégradation, `<Approfondir>`
   replié + indexable, chaîne MDX, helpers d'affichage.
-- Étape 4 — Offres (gabarit répété trois fois).
+- **Étape 4 — Offres.** ✅ gabarit unique `components/offre-carte.tsx` rendu trois fois
+  (`app/offres/page.tsx`), contenu en frontmatter seul (`content/offres/`, ADR-014) —
+  aucun prix en dur, `content/offres-complementaires/` pour les deux blocs de bas de
+  page, bloc « Déjà fait » résolu par slug via `getRealisation` (ADR-015, jamais de
+  lien mort — vérifié par build de contrôle). Scaffolding `offre-1/2/3` + les deux
+  compléments en `brouillon: true`, `TODO —`, en attente du contenu de l'auteur.
 - Étape 5 — Accueil, à propos, contact.
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
 

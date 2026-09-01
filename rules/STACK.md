@@ -69,7 +69,9 @@ Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépô
   2. validation du schéma de frontmatter (zod, schéma strict, `slug` == nom de fichier) ;
   3. dégradation du filtre d'index (le HTML statique liste toutes les fiches) ;
   4. `<Approfondir>` replié par défaut et contenu présent dans le HTML ;
-  5. helpers d'affichage des champs optionnels (`lib/affichage.ts`).
+  5. helpers d'affichage des champs optionnels (`lib/affichage.ts`) ;
+  6. filtre `brouillon` des offres et des blocs de bas de page ;
+  7. `resolveDejaFait` — jamais de lien mort ni d'erreur, y compris référence en brouillon.
 * Pas de tests au-delà : pas de rendu pixel, pas de e2e.
 
 ## Intégration continue

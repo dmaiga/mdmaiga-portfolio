@@ -164,3 +164,36 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   absente). Elle n'a de sens qu'avec `image_couverture` ; l'imposer partout
   n'apporterait rien. Absente ou `null` → `alt=""` (couverture décorative) ;
   renseignée → texte alternatif porteur d'information (captures d'interface).
+
+## ADR-014 — Contenu des offres : frontmatter seul, sans corps MDX
+*2026-09-01 · Acté*
+- **Décision.** Chaque offre (`content/offres/<slug>.mdx`) et chaque bloc de bas de
+  page (`content/offres-complementaires/<slug>.mdx`) porte tout son contenu en
+  frontmatter (listes, texte court). Le corps du fichier n'est pas lu ni compilé.
+- **Pourquoi.** Contrairement à une réalisation, une offre n'a pas de récit en
+  prose libre : c'est une fiche technique (accroche, critères, livrables, étapes,
+  délai, budget). La représenter en listes de frontmatter la rend éditable puce
+  par puce, sans ambiguïté de structure, et évite une compilation MDX pour un
+  contenu qui n'en a pas l'usage. Réutilise `gray-matter` + `zod`, déjà en place —
+  aucune dépendance supplémentaire.
+- **Alternatives écartées.** Corps MDX avec sections `## Vous êtes concerné·e si…`
+  etc., comme les réalisations : oblige à faire correspondre des titres de
+  section par leur texte (fragile) pour en extraire une liste, pour un gain nul
+  ici (pas de mise en forme riche, pas de composant à insérer).
+- **Prix.** Toujours en texte libre dans le frontmatter (`delai`, `budget`),
+  jamais en dur dans un composant — ils changeront.
+
+## ADR-015 — Bloc « Déjà fait » : référence par slug, résolution silencieuse
+*2026-09-01 · Acté*
+- **Décision.** Une offre référence au plus une réalisation via `deja_fait_slug`.
+  `resolveDejaFait()` (`lib/offres.ts`) appelle `getRealisation()` — qui renvoie déjà
+  `null` pour une fiche absente ou en brouillon — et ne recopie aucune donnée de la
+  réalisation dans le frontmatter de l'offre (le titre est lu en direct au rendu).
+  `null` → le bloc ne s'affiche pas ; jamais de lien mort, jamais d'erreur de build.
+- **Pourquoi.** Toutes les réalisations sont en brouillon aujourd'hui (saisie
+  progressive — ADR-005) : c'est le cas normal, pas une exception à gérer au cas
+  par cas dans chaque composant qui référence une fiche.
+- **Vérifié.** Build de contrôle avec une offre publiée référençant `netsup`
+  (réellement en brouillon dans le dépôt) : build réussi, bloc absent du HTML.
+- **Alternatives écartées.** Dupliquer titre/lien dans le frontmatter de l'offre :
+  viole l'anti-duplication, désynchronisable si la réalisation est renommée.

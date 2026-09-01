@@ -10,7 +10,8 @@ Les *décisions* et leurs compromis vivent dans `docs/DECISIONS.md` (non dupliqu
 
 - **Next.js (App Router, TypeScript)**, rendu **statique par défaut**, déployé sur **Vercel**.
 - **Aucun backend, aucune base de données, aucun appel API** au build ou au runtime.
-- Le contenu vit dans des fichiers **MDX versionnés** sous `content/realisations/`.
+- Le contenu vit dans des fichiers **MDX versionnés** sous `content/realisations/`,
+  `content/offres/` et `content/offres-complementaires/`.
 - Le build ne dépend d'aucun réseau (données locales, polices auto-hébergées).
 
 ## 2. Routes
@@ -18,7 +19,7 @@ Les *décisions* et leurs compromis vivent dans `docs/DECISIONS.md` (non dupliqu
 | Route | Contenu | Génération |
 |---|---|---|
 | `/` | Accueil | statique |
-| `/offres` | Trois offres, gabarit identique répété | statique |
+| `/offres` | Trois offres (gabarit répété) + 2 blocs de bas de page | statique |
 | `/realisations` | Index filtrable par `type` | statique |
 | `/realisations/[slug]` | Fiche de cas, deux couches | `generateStaticParams` (hors brouillons) |
 | `/a-propos` | Démarche et parcours | statique |
@@ -102,56 +103,105 @@ Le paramètre `dossier` optionnel de ces fonctions est un point d'entrée de tes
 | `components/realisation-carte.tsx` | carte d'index ; tolère `image_couverture: null` et `technologies: []` |
 | `lib/affichage.ts` | helpers purs testés (`formatPeriode`, `technologiesAffichees`, …) — aucun libellé orphelin quand un champ optionnel manque |
 
-## 4. Taxonomie
+## 4. Modèle de contenu — Offres
+
+Trois offres (`content/offres/<slug>.mdx`) + des blocs de bas de page distincts
+(`content/offres-complementaires/<slug>.mdx`). **Un seul composant** de gabarit
+(`components/offre-carte.tsx`), rendu une fois par offre — jamais trois blocs
+recopiés. Aucun contenu (prix compris) n'est en dur dans le code : tout vit dans
+le frontmatter, validé par zod au build. Pas de corps MDX en prose : le contenu
+d'une offre est entièrement structuré (listes, texte court), rien à compiler.
+
+### Frontmatter d'une offre
+
+| Champ | Type | Notes |
+|---|---|---|
+| `slug` | string | doit correspondre au nom de fichier |
+| `titre`, `accroche` | string | |
+| `concerne_si` | string[] | « Vous êtes concerné·e si… », au moins un élément |
+| `obtenez` | string[] | « Ce que vous obtenez », au moins un élément |
+| `etapes` | string[] | « Comment ça se passe », rendu en `<ol>` (numérotation HTML) |
+| `delai`, `budget` | string | texte libre, jamais de montant en dur dans le code |
+| `deja_fait_slug` | string \| null | référence une fiche `content/realisations/` — voir résolution ci-dessous |
+| `cta_libelle`, `cta_lien` | string | bouton d'appel à l'action ; `cta_lien` : `/chemin`, `mailto:`, `tel:` ou URL absolue |
+| `ordre` | number | position parmi les trois offres |
+| `brouillon` | boolean | même garde-fou que les réalisations |
+
+### Frontmatter d'un bloc de bas de page
+
+`slug`, `titre`, `texte` (string), `cta_libelle`/`cta_lien` (tous deux `string` ou
+tous deux `null` — validé), `ordre`, `brouillon`.
+
+### Résolution « Déjà fait »
+
+`resolveDejaFait(slug)` (`lib/offres.ts`) appelle `getRealisation(slug)`, qui renvoie
+déjà `null` pour une fiche absente **ou en brouillon**. Dans les deux cas : `null`
+remonte, le composant n'affiche pas le bloc. **Aucun lien mort, aucune erreur de
+build** — vérifié par un build de contrôle (offre publiée référençant une fiche
+réellement en brouillon). Aucune donnée de la réalisation n'est recopiée dans le
+frontmatter de l'offre (titre lu en direct via la résolution) — anti-duplication.
+
+### Chaîne de lecture et rendu
+
+| Module / composant | Rôle |
+|---|---|
+| `lib/offre-frontmatter.ts` | schémas zod stricts `offreSchema` / `complementSchema` |
+| `lib/offres.ts` | lecture `fs`, validation, filtre brouillon, tri, `resolveDejaFait` |
+| `components/offre-carte.tsx` | gabarit unique, rendu trois fois par `app/offres/page.tsx` |
+| `components/bloc-complementaire.tsx` | bloc de bas de page, CTA optionnel |
+
+## 5. Taxonomie
 
 Source **unique** : `lib/taxonomie.ts`. Aucune recopie ailleurs, y compris dans la
 génération d'images Open Graph. Deux dimensions — voir `docs/DECISIONS.md` ADR-006.
 
-## 5. Rendu & build
+## 6. Rendu & build
 
 - Toutes les pages sont générées au build. `generateStaticParams` énumère les fiches
   **non brouillon** uniquement.
 - Aucune requête réseau au build. Aucune variable d'environnement obligatoire, hormis
-  `NEXT_PUBLIC_SITE_URL` (voir §8), qui a un repli explicite et signalé.
+  `NEXT_PUBLIC_SITE_URL` (voir §9), qui a un repli explicite et signalé.
 
-## 6. Métadonnées & Open Graph
+## 7. Métadonnées & Open Graph
 
 - Métadonnées sur **toutes** les pages, accueil compris.
 - Open Graph + image de partage **par page**. Les libellés de taxonomie affichés dans
   les images sont lus depuis `lib/taxonomie.ts`, jamais recopiés.
 - `metadataBase` dérive de `SITE_URL` (`lib/site.ts`).
 
-## 7. Sitemap & robots
+## 8. Sitemap & robots
 
 - `sitemap.ts` et `robots.ts` générés.
 - Les fiches `brouillon: true` sont **exclues** du sitemap.
 
-## 8. Variables d'environnement
+## 9. Variables d'environnement
 
 | Variable | Obligatoire | Défaut |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | non | `FALLBACK` dans `lib/site.ts`, avec `console.warn` si absente |
 | clé du service de formulaire | non (au build) | — ; requise au runtime pour l'envoi |
 
-## 9. Performance (cible : mobile lente)
+## 10. Performance (cible : mobile lente)
 
 - Polices auto-hébergées (`next/font/local`, `public/fonts/`).
 - Images dimensionnées, `next/image`, refus de tout fichier > 300 Ko dans `public/`.
 - Aucune requête tierce bloquante.
 
-## 10. Accessibilité
+## 11. Accessibilité
 
 - Un seul `<h1>` par page, hiérarchie de titres respectée.
 - Textes alternatifs sur les images porteuses de sens.
 - Navigation clavier complète, y compris `<Approfondir>` et le filtre de l'index.
 
-## 11. Arborescence
+## 12. Arborescence
 
 ```
 portfolio-freelance/
 ├── app/                     # routes (App Router)
 ├── components/              # composants partagés (+ ui/)
 ├── content/realisations/    # fiches MDX
+├── content/offres/                  # 3 offres
+├── content/offres-complementaires/  # blocs de bas de page
 ├── docs/                    # DECISIONS.md, ARCHITECTURE.md
 ├── lib/                     # site.ts, taxonomie.ts, chaîne de contenu
 ├── public/                  # fonts/, realisations/ (médias)

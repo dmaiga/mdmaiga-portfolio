@@ -39,6 +39,11 @@ export function formatPeriode(debut: string, fin: string | null): string {
  * Technologies à afficher sur une carte : `max` visibles + un compteur du reste.
  * `technologies` peut être vide — l'appelant n'affiche alors aucun bloc.
  */
+/** Un lien http(s) s'ouvre dans un nouvel onglet ; un chemin/mailto/tel reste in-page. */
+export function estLienExterne(href: string): boolean {
+  return href.startsWith("http://") || href.startsWith("https://")
+}
+
 export function technologiesAffichees(
   technologies: string[],
   max = 4,
