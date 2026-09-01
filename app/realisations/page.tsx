@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import { getRealisationsPubliees } from "@/lib/realisations"
 import { RealisationsBrowser } from "@/components/realisations-browser"
+import { metadonneesPage } from "@/lib/metadonnees"
 
-export const metadata: Metadata = {
-  title: "Réalisations",
-  description: "TODO — description de l'index des réalisations.",
+export function generateMetadata(): Metadata {
+  return metadonneesPage("realisations")
 }
 
 export default function RealisationsPage() {

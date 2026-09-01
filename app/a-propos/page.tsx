@@ -3,10 +3,10 @@ import Image from "next/image"
 import { getAPropos } from "@/lib/contenu-pages"
 import { Lien } from "@/components/lien"
 import type { Bloc } from "@/lib/schema-commun"
+import { metadonneesPage } from "@/lib/metadonnees"
 
-export const metadata: Metadata = {
-  title: "À propos",
-  description: "TODO — description de la page à propos.",
+export function generateMetadata(): Metadata {
+  return metadonneesPage("a_propos")
 }
 
 function SectionBlocs({ titre, blocs }: { titre: string; blocs: Bloc[] }) {

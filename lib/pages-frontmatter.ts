@@ -134,3 +134,34 @@ export const contactSchema = z
 
 export type Contact = z.infer<typeof contactSchema>
 export type ChampContact = z.infer<typeof champContactSchema>
+
+/* --------------------------- Métadonnées ------------------------------ */
+
+/**
+ * Titres et descriptions de `<meta>` / Open Graph. Vivent ici, pas dans les
+ * composants de page (`content/pages/meta.mdx`). `titre: null` → le nom du site
+ * seul (utile pour l'accueil).
+ */
+const pageMetaSchema = z.object({
+  titre: z.string().min(1).nullable(),
+  description: z.string().min(1),
+})
+
+export const metaSchema = z
+  .object({
+    site: z.object({
+      nom: z.string().min(1),
+      description: z.string().min(1),
+    }),
+    pages: z.object({
+      accueil: pageMetaSchema,
+      offres: pageMetaSchema,
+      realisations: pageMetaSchema,
+      a_propos: pageMetaSchema,
+      contact: pageMetaSchema,
+    }),
+  })
+  .strict()
+
+export type Meta = z.infer<typeof metaSchema>
+export type PageMeta = z.infer<typeof pageMetaSchema>

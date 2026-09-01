@@ -77,7 +77,10 @@ Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépô
   8. lecture + validation du contenu des pages fixes (`lib/contenu-pages.ts`) ;
   9. `SiteNav` — cinq entrées, ordre imposé, `aria-current` unique sur la page active ;
   10. garde-fou de publication (`lib/content-guards.test.ts`) — aucun `TODO —` ni
-      `[VÉRIFIER` dans une réalisation / offre / bloc de page `brouillon: false`.
+      `[VÉRIFIER` dans une réalisation / offre / bloc de page `brouillon: false`,
+      ni dans les pages fixes (`content/pages/*.mdx`, meta comprise) ;
+  11. sitemap (`lib/sitemap.test.ts`) — brouillons exclus, testé sur fixtures et
+      sur le sitemap réel (`app/sitemap.ts`).
 * Pas de tests au-delà : pas de rendu pixel, pas de e2e.
 
 ## Intégration continue

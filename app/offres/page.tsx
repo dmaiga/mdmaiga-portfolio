@@ -2,10 +2,10 @@ import type { Metadata } from "next"
 import { getOffresPubliees, getBlocPage, resolveDejaFait } from "@/lib/offres"
 import { OffreCarte } from "@/components/offre-carte"
 import { BlocPageVue } from "@/components/bloc-page"
+import { metadonneesPage } from "@/lib/metadonnees"
 
-export const metadata: Metadata = {
-  title: "Offres",
-  description: "TODO — description de la page offres.",
+export function generateMetadata(): Metadata {
+  return metadonneesPage("offres")
 }
 
 export default function OffresPage() {

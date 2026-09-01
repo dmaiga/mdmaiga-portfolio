@@ -5,9 +5,10 @@ import { getOffresPubliees } from "@/lib/offres"
 import { getRealisationsMisesEnAvant } from "@/lib/realisations"
 import { RealisationCarte } from "@/components/realisation-carte"
 import { Lien } from "@/components/lien"
+import { metadonneesPage } from "@/lib/metadonnees"
 
-export const metadata: Metadata = {
-  description: "TODO — description de l'accueil.",
+export function generateMetadata(): Metadata {
+  return metadonneesPage("accueil")
 }
 
 const boutonPrincipal =

@@ -5,12 +5,12 @@
  * Open Graph. `next build` ne doit PAS échouer si elle est absente : on retombe
  * sur une valeur par défaut explicite, et on le signale (repli non silencieux).
  *
- * TODO — Remplacer FALLBACK par l'URL Vercel de production réelle.
- * Cette valeur changera au passage sur le domaine définitif (.ml prévu).
- * Ne jamais utiliser localhost comme défaut : les métadonnées absolues
- * (OG, canoniques) seraient cassées en production.
+ * `FALLBACK` est provisoire (voir la liste de mise en ligne du rapport d'étape 6) :
+ * il faut définir `NEXT_PUBLIC_SITE_URL` sur Vercel, puis le passer au domaine
+ * définitif (.ml prévu). Ne jamais utiliser localhost comme défaut : les
+ * métadonnées absolues (OG, canoniques) seraient cassées en production.
  */
-const FALLBACK = "https://portfolio-freelance.vercel.app" // TODO — URL Vercel de prod
+const FALLBACK = "https://portfolio-freelance.vercel.app" // provisoire
 
 if (!process.env.NEXT_PUBLIC_SITE_URL) {
   console.warn(

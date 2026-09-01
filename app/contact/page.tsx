@@ -3,10 +3,10 @@ import { getContact } from "@/lib/contenu-pages"
 import { CLE_FORMULAIRE_CONTACT } from "@/lib/site"
 import { ContactFormulaire } from "@/components/contact-formulaire"
 import { Lien } from "@/components/lien"
+import { metadonneesPage } from "@/lib/metadonnees"
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "TODO — description de la page contact.",
+export function generateMetadata(): Metadata {
+  return metadonneesPage("contact")
 }
 
 export default function ContactPage() {

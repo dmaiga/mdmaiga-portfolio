@@ -75,6 +75,52 @@ Une réalisation = un fichier `content/realisations/<slug>.mdx`.
 `<Approfondir>` : bloc **replié par défaut**, dépliable au clic. `<details>` natif ou
 disclosure accessible (clavier, `aria-expanded`), sans dépendance lourde.
 
+### Gabarit d'une fiche (à copier)
+
+```mdx
+---
+slug: mon-slug
+titre: "…"
+resume: "…"
+type: plateforme-metier          # plateforme-metier | decisionnel | institutionnel | laboratoire
+cadre: independant               # salarie | independant | academique
+secteur: "…"
+client: "…"
+client_anonymise: true
+role: "…"
+debut: 2026-01
+production_depuis: null          # AAAA-MM ou null
+fin: null                        # AAAA-MM ou null (null = en cours)
+utilisateurs: "…"
+technologies: []                 # peut être vide
+mis_en_avant: false
+brouillon: true                  # true tant que la fiche n'est pas prête
+ordre: 999
+lien_demo: null
+image_couverture: null
+alt_couverture: null             # à renseigner si la couverture est une capture d'interface
+---
+
+## Avant
+…
+
+## Ce qui a été mis en place
+…
+
+## Aujourd'hui
+…
+
+<Approfondir>
+
+### Choix de conception
+…
+
+### Retour d'expérience
+…
+
+</Approfondir>
+```
+
 ### Chaîne de lecture (`lib/`)
 
 | Module | Rôle |
@@ -201,15 +247,28 @@ génération d'images Open Graph. Deux dimensions — voir `docs/DECISIONS.md` A
 
 ## 8. Métadonnées & Open Graph
 
-- Métadonnées sur **toutes** les pages, accueil compris.
-- Open Graph + image de partage **par page**. Les libellés de taxonomie affichés dans
-  les images sont lus depuis `lib/taxonomie.ts`, jamais recopiés.
-- `metadataBase` dérive de `SITE_URL` (`lib/site.ts`).
+- **Toutes** les pages ont un titre et une description, tirés du contenu
+  (`content/pages/meta.mdx` pour les pages fixes ; frontmatter `titre` / `resume`
+  pour les fiches). Rien n'est écrit dans les composants de page — voir
+  `lib/metadonnees.ts` (`metadonneesSite`, `metadonneesPage`, `metadonneesFiche`).
+  Le layout porte `title.template` + `title.default` + Open Graph du site.
+- **Image Open Graph par page**, générée au build via `next/og` (`lib/og.tsx`) :
+  fichiers `app/**/opengraph-image.tsx`. 1200×630 PNG, aucun appel réseau.
+  `app/realisations/[slug]/opengraph-image.tsx` a `generateStaticParams` =
+  slugs publiés + `dynamicParams = false` → **une fiche en brouillon n'en génère
+  aucune** (elle répond 404).
+- `metadataBase` dérive de `SITE_URL` (`lib/site.ts`). `alternates.canonical` par page.
+- Le garde-fou `content-guards` couvre `content/pages/meta.mdx` : pas de marqueur
+  d'inachèvement dans un titre ou une description publiés.
 
 ## 9. Sitemap & robots
 
-- `sitemap.ts` et `robots.ts` générés.
-- Les fiches `brouillon: true` sont **exclues** du sitemap.
+- `app/sitemap.ts` = `construireSitemap(SITE_URL, getSlugsPublies())` — logique de
+  construction pure dans `lib/sitemap.ts` (5 pages fixes + une entrée par fiche
+  publiée), testée sur fixtures **et** sur le sitemap réel (`lib/sitemap.test.ts`) :
+  un brouillon exclu par `getSlugsPublies()` n'apparaît pas.
+- `app/robots.ts` : `allow: /` + lien vers `sitemap.xml`. Les fiches brouillon
+  n'ont pas de route (404) : rien à interdire.
 
 ## 10. Variables d'environnement
 
@@ -218,19 +277,32 @@ génération d'images Open Graph. Deux dimensions — voir `docs/DECISIONS.md` A
 | `NEXT_PUBLIC_SITE_URL` | non | `FALLBACK` dans `lib/site.ts`, avec `console.warn` si absente |
 | `NEXT_PUBLIC_WEB3FORMS_KEY` | non | `null` → formulaire de contact non rendu, e-mail affiché à la place |
 
-## 11. Performance (cible : mobile lente)
+## 11. Performance (cible : connexion mobile lente à Bamako)
 
-- Polices auto-hébergées (`next/font/local`, `public/fonts/`).
-- Images dimensionnées, `next/image`, refus de tout fichier > 300 Ko dans `public/`.
-- Aucune requête tierce bloquante.
+- Aucune police web : `--font-inter` non fourni → repli système, zéro téléchargement.
+- Aucune image chargée par les pages aujourd'hui (photo à propos `null`, aucune
+  couverture publiée). `next/image` pour les futures ; refus de tout fichier
+  > 300 Ko dans `public/`.
+- Aucune requête tierce bloquante. Web3Forms seulement à la soumission du formulaire.
+- Poids mesuré (`next start`, gzip, HTML + JS + CSS) : **~205 à 210 Ko par page**,
+  dont ~200 Ko de JavaScript qui est le socle Next 16 + React 19 (aucune lib
+  serveur — mdx, zod, gray-matter, satori — ne fuit côté client). Le HTML utile
+  fait 3 à 8 Ko gzip et s'affiche avant le JavaScript. Point de vigilance : ce
+  socle JS est lourd pour la cible ; il est incompressible sans retirer de
+  l'interactivité.
 
 ## 12. Accessibilité
 
-- Un seul `<h1>` par page, hiérarchie de titres respectée.
-- Textes alternatifs sur les images porteuses de sens.
-- Navigation clavier complète, y compris `<Approfondir>` et le filtre de l'index.
-- `SiteNav` : `<nav aria-label>`, `aria-current="page"` sur l'entrée active.
-- Formulaire de contact : `<label>` associé à chaque champ, statut en `aria-live`.
+- Un seul `<h1>` par page, hiérarchie `h1 > h2 > h3` sans saut (vérifié sur le HTML).
+- `SiteNav` : `<nav aria-label>`, `aria-current="page"` sur l'entrée active, liens
+  natifs (ordre de tabulation = ordre visuel, aucun `tabindex`).
+- Formulaire de contact : `<label htmlFor>` sur chaque champ, éléments natifs
+  (`input` / `select` / `textarea` / `button`), statut d'envoi en `aria-live`.
+- `<Approfondir>` : `<details>`/`<summary>` natif, focusable et actionnable au clavier.
+- Textes alternatifs sur les images porteuses de sens (`alt_couverture`).
+- Non vérifié automatiquement : ratios de contraste (palette annoncée AA dans
+  `globals.css`, contrôle visuel/outil à faire), parcours clavier réel dans un
+  navigateur.
 
 ## 13. Arborescence
 
@@ -241,10 +313,15 @@ portfolio-freelance/
 ├── content/realisations/    # fiches MDX
 ├── content/offres/                  # 3 offres
 ├── content/offres-blocs/            # en-tete, mission longue, bandeau de fin
-├── content/pages/                   # accueil, a-propos, contact
+├── content/pages/                   # accueil, a-propos, contact, meta
 ├── docs/                    # DECISIONS.md, ARCHITECTURE.md
-├── lib/                     # site.ts, taxonomie.ts, chaîne de contenu
+├── lib/                     # site.ts, taxonomie.ts, metadonnees.ts, sitemap.ts, og.tsx, chaîne de contenu
 ├── public/                  # fonts/, realisations/ (médias)
-├── rules/                   # ABOUT-ME.md, STACK.md, GIT.md
+├── rules/                   # ABOUT-ME.md, STACK.md, GIT.md, LANGUE.md
 └── .github/workflows/ci.yml
 ```
+
+`app/` contient aussi : `opengraph-image.tsx` (racine + une par page + `[slug]`),
+`sitemap.ts`, `robots.ts`. Redirections `/projects` → `/realisations` dans
+`next.config.ts`, **vérifiées sur le build** (`next start` : 308 vers la bonne
+cible, y compris `/projects/:slug`).

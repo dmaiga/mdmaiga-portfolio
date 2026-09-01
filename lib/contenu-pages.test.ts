@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url"
 import { describe, it, expect } from "vitest"
-import { getAccueil, getAPropos, getContact } from "@/lib/contenu-pages"
+import { getAccueil, getAPropos, getContact, getMeta } from "@/lib/contenu-pages"
 
 const dir = (nom: string) =>
   fileURLToPath(new URL(`./__fixtures__/${nom}`, import.meta.url))
@@ -39,15 +39,24 @@ describe("contenu des pages fixes — lecture et validation", () => {
     expect(liste.options).not.toBeNull()
   })
 
+  it("meta : lit le nom du site et un titre/description par page", () => {
+    const m = getMeta(PAGES)
+    expect(m.site.nom).toBe("Nom Du Site")
+    expect(m.pages.accueil.titre).toBeNull()
+    expect(m.pages.offres.titre).toBe("Offres")
+    expect(m.pages.contact.description).toContain("fixture")
+  })
+
   it("rejette un frontmatter d'accueil invalide (blocs vide, lien cassé, e-mail sans @, section manquante, clé inconnue)", () => {
     expect(() => getAccueil(dir("pages-invalide"))).toThrow(/Frontmatter invalide/)
   })
 })
 
 describe("contenu réel du dépôt", () => {
-  it("accueil, à propos et contact ont un frontmatter valide", () => {
+  it("accueil, à propos, contact et meta ont un frontmatter valide", () => {
     expect(() => getAccueil()).not.toThrow()
     expect(() => getAPropos()).not.toThrow()
     expect(() => getContact()).not.toThrow()
+    expect(() => getMeta()).not.toThrow()
   })
 })

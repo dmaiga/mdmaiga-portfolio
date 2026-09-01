@@ -64,7 +64,15 @@ validation.
   (`contact.mdx` décrit les champs), Web3Forms, dégrade si la clé manque (ADR-017).
   Cinq `[VÉRIFIER]` levés (valeurs définitives). Garde-fou `content-guards` actif sur
   les pages fixes. Règles de langue du site : `rules/LANGUE.md` (ADR-018).
-- Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
+- **Étape 6 — Finition.** ✅ métadonnées de toutes les pages tirées du contenu
+  (`content/pages/meta.mdx` + `lib/metadonnees.ts`, ADR-020) ; image Open Graph par
+  page générée au build (`lib/og.tsx`, `app/**/opengraph-image.tsx`) ; `sitemap.ts` /
+  `robots.ts` avec brouillons exclus + test branché sur le vrai sitemap
+  (`lib/sitemap.test.ts`) ; `dynamicParams = false` sur `[slug]` → brouillon = 404
+  strict (ADR-021) ; redirections `/projects` vérifiées sur `next start` (308) ;
+  poids ~205 Ko gzip/page (socle Next 16, pas notre code). Fiche modèle supprimée,
+  gabarit déplacé dans `docs/ARCHITECTURE.md`. Voir le rapport pour la liste de
+  mise en ligne et ce qui n'a pas pu être vérifié.
 
 ---
 

@@ -5,8 +5,13 @@ import { getRealisation, getSlugsPublies } from "@/lib/realisations"
 import { TYPES, CADRES } from "@/lib/taxonomie"
 import { ContenuMdx } from "@/components/contenu-mdx"
 import { formatMoisAnnee, formatPeriode } from "@/lib/affichage"
+import { metadonneesFiche } from "@/lib/metadonnees"
 
 type Params = { params: Promise<{ slug: string }> }
+
+// Seules les fiches publiées ont une route. Un slug inconnu (fiche absente ou
+// en brouillon) → 404, sans rendu à la demande.
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return getSlugsPublies().map((slug) => ({ slug }))
@@ -16,7 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params
   const fiche = getRealisation(slug)
   if (!fiche) return {}
-  return { title: fiche.frontmatter.titre, description: fiche.frontmatter.resume }
+  return metadonneesFiche(fiche.frontmatter.titre, fiche.frontmatter.resume, slug)
 }
 
 export default async function FichePage({ params }: Params) {

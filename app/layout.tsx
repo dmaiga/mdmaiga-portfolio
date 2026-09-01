@@ -1,16 +1,11 @@
 import type { Metadata } from "next"
-import { SITE_URL } from "@/lib/site"
+import { metadonneesSite } from "@/lib/metadonnees"
 import { SiteNav } from "@/components/site-nav"
 import { SiteFooter } from "@/components/site-footer"
 import "./globals.css"
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    template: "%s | Mahamane Daouda Maiga",
-    default: "Mahamane Daouda Maiga — Portfolio freelance",
-  },
-  description: "TODO — description générale du portfolio freelance.",
+export function generateMetadata(): Metadata {
+  return metadonneesSite()
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

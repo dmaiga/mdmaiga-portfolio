@@ -6,9 +6,11 @@ import {
   accueilSchema,
   aProposSchema,
   contactSchema,
+  metaSchema,
   type Accueil,
   type APropos,
   type Contact,
+  type Meta,
 } from "@/lib/pages-frontmatter"
 
 /**
@@ -40,4 +42,8 @@ export function getAPropos(dossier: string = DOSSIER_PAGES): APropos {
 
 export function getContact(dossier: string = DOSSIER_PAGES): Contact {
   return lirePage("contact.mdx", contactSchema, dossier)
+}
+
+export function getMeta(dossier: string = DOSSIER_PAGES): Meta {
+  return lirePage("meta.mdx", metaSchema, dossier)
 }

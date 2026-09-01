@@ -272,3 +272,33 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   l'agent dans le fichier.
 - **Alternatives écartées.** Champs fixes dans le composant : oblige à modifier le
   code pour changer une option de liste.
+
+## ADR-020 — Métadonnées tirées du contenu, images OG générées au build
+*2026-09-01 · Acté*
+- **Décision.** Titres et descriptions `<meta>` / Open Graph vivent dans
+  `content/pages/meta.mdx` (pages fixes) ou le frontmatter des fiches, jamais
+  dans les composants. `lib/metadonnees.ts` construit les objets `Metadata`.
+  Image OG par page générée au build via `next/og` (`lib/og.tsx` +
+  `app/**/opengraph-image.tsx`), 1200x630 PNG, sans appel réseau ni police web
+  (repli de `next/og`).
+- **Pourquoi.** Un lien partagé sur LinkedIn ou WhatsApp est le premier contact
+  de la plupart des prospects : il faut un titre, une phrase et une image
+  corrects sur chaque page, y compris l'accueil. Les mettre dans le contenu les
+  rend éditables et les fait passer sous le garde-fou `content-guards`.
+- **`meta.mdx`.** Les descriptions sont reprises mot pour mot d'une phrase de la
+  page quand elle existe ; celle de `/realisations` est à relire (pas de source
+  directe). `titre: null` pour l'accueil → le `<title>` est le nom du site.
+- **Alternatives écartées.** Titres/descriptions en dur dans chaque `page.tsx` :
+  échappent au garde-fou et à la relecture de l'auteur. Une seule image OG pour
+  tout le site : un partage de `/offres` afficherait le même visuel que l'accueil.
+
+## ADR-021 — `dynamicParams = false` sur les fiches : brouillon = 404 strict
+*2026-09-01 · Acté*
+- **Décision.** `app/realisations/[slug]/page.tsx` et son `opengraph-image.tsx`
+  déclarent `export const dynamicParams = false`. `generateStaticParams` ne
+  renvoie que les slugs publiés.
+- **Conséquence.** Un slug inconnu — fiche absente **ou en brouillon** — répond
+  404, sans rendu à la demande, et ne produit aucune image OG. Vérifié sur
+  `next start` (`/realisations/netsup` → 404).
+- **Pourquoi.** Rend la garantie de l'ADR-005 absolue au niveau du routeur, pas
+  seulement au niveau de la requête de données.
