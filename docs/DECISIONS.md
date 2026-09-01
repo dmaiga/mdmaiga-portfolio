@@ -243,3 +243,32 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   seule fonction de soumission).
 - **Alternatives écartées.** `mailto:` seul (déjà écarté ADR-008) ; backend dédié
   (réintroduit un serveur — ADR-002).
+
+## ADR-018 — Règles de langue du contenu du site
+*2026-09-01 · Acté*
+- **Décision.** Sept règles imposées par l'auteur pour tout texte visible du site
+  (`rules/LANGUE.md`) : pas d'emoji, pas de tiret long, langue parlée, une idée
+  par phrase (25 mots max côté client), verbes d'action, un chiffre plutôt qu'un
+  adjectif, aucun sigle pour un lecteur non technique.
+- **Conséquences.**
+  - `formatPeriode` écrit « Janvier 2026 à juin 2026 » (plus de tiret `–`).
+  - Tout texte produit par l'agent (libellés, messages, placeholders) suit ces
+    règles. Le contenu livré par l'auteur n'est pas réécrit.
+  - `lib/content-guards.test.ts` : une réalisation, une offre ou un bloc de page
+    `brouillon: false` ne doit contenir ni `TODO —` ni `[VÉRIFIER`.
+- **Portée.** S'applique rétroactivement en esprit ; le contenu déjà livré
+  (offres, NETSUP) n'est pas modifié sans accord explicite de l'auteur.
+
+## ADR-019 — Formulaire de contact piloté par le contenu
+*2026-09-01 · Acté*
+- **Décision.** Les champs du formulaire de contact (libellés, types, listes
+  d'options, obligatoire ou non) sont décrits dans `content/pages/contact.mdx`
+  (`formulaire.champs`), pas codés dans le composant. `ContactFormulaire` les rend
+  dynamiquement ; Web3Forms reçoit tous les champs nommés.
+- **Pourquoi.** Le contenu réel définit sept champs dont trois listes déroulantes
+  à options rédigées (« Cadrage et architecture », « Une idée à explorer », …).
+  Ces options sont éditoriales : l'auteur doit pouvoir les ajuster sans toucher au
+  code. Le nom technique de chaque champ (`nom`, kebab-case) reste fixé par
+  l'agent dans le fichier.
+- **Alternatives écartées.** Champs fixes dans le composant : oblige à modifier le
+  code pour changer une option de liste.

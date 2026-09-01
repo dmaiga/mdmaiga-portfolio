@@ -27,3 +27,15 @@ export const sectionTexteSchema = z.object({
   titre: z.string().min(1),
   paragraphes: z.array(z.string().min(1)).min(1),
 })
+
+/**
+ * `{ titre, texte }` — un mini-bloc « intitulé en gras + phrase ».
+ * Utilisé pour « le problème que je traite », « comment je travaille »,
+ * « compétences ».
+ */
+export const blocSchema = z.object({
+  titre: z.string().min(1),
+  texte: z.string().min(1),
+})
+
+export type Bloc = z.infer<typeof blocSchema>

@@ -75,7 +75,9 @@ Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépô
   7. `resolveDejaFait` — texte toujours affiché, lien seulement si la fiche est publiée
      (référence absente ou en brouillon → texte seul, jamais de lien mort ni d'erreur) ;
   8. lecture + validation du contenu des pages fixes (`lib/contenu-pages.ts`) ;
-  9. `SiteNav` — cinq entrées, ordre imposé, `aria-current` unique sur la page active.
+  9. `SiteNav` — cinq entrées, ordre imposé, `aria-current` unique sur la page active ;
+  10. garde-fou de publication (`lib/content-guards.test.ts`) — aucun `TODO —` ni
+      `[VÉRIFIER` dans une réalisation / offre / bloc de page `brouillon: false`.
 * Pas de tests au-delà : pas de rendu pixel, pas de e2e.
 
 ## Intégration continue

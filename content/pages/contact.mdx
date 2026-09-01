@@ -1,11 +1,62 @@
 ---
-titre: "TODO — titre de la page Contact"
+titre: "Parlons de votre situation"
 intro:
-  - "TODO — court texte d'introduction du contact"
+  - "Décrivez-moi ce qui se passe chez vous en quelques lignes : ce qui est géré à la main, ce qui vous échappe, ce que vous aimeriez voir. Je réponds sous deux jours ouvrés."
+  - "Si votre besoin n'est pas pour moi, je vous le dirai, et je vous orienterai si je peux."
 email: "mdmaiga01@gmail.com"
 liens:
   - libelle: "LinkedIn"
-    href: "https://www.linkedin.com/in/TODO-profil-linkedin"
+    href: "https://www.linkedin.com/in/mdmaiga"
   - libelle: "GitHub"
     href: "https://github.com/dmaiga"
+formulaire:
+  bouton: "Envoyer"
+  message_repli: "Le formulaire n'est pas encore actif. Écrivez-moi directement à mdmaiga01@gmail.com, j'y réponds aussi vite."
+  champs:
+    - nom: nom
+      libelle: "Nom"
+      type: texte
+      requis: true
+      options: null
+    - nom: email
+      libelle: "Email"
+      type: email
+      requis: true
+      options: null
+    - nom: organisation
+      libelle: "Organisation"
+      type: texte
+      requis: false
+      options: null
+    - nom: type-de-besoin
+      libelle: "Type de besoin"
+      type: liste
+      requis: false
+      options:
+        - "Cadrage et architecture"
+        - "Tableau de bord de pilotage"
+        - "Plateforme métier"
+        - "Mission longue ou renfort d'équipe"
+        - "Autre"
+    - nom: ou-vous-en-etes
+      libelle: "Où vous en êtes"
+      type: liste
+      requis: false
+      options:
+        - "Une idée à explorer"
+        - "Un cahier des charges existant"
+        - "Un système en place à reprendre ou à remplacer"
+    - nom: horizon
+      libelle: "Horizon"
+      type: liste
+      requis: false
+      options:
+        - "Ce mois-ci"
+        - "Ce trimestre"
+        - "Je me renseigne"
+    - nom: votre-situation
+      libelle: "Votre situation"
+      type: zone_texte
+      requis: true
+      options: null
 ---

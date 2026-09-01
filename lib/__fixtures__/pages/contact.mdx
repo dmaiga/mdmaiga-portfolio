@@ -8,4 +8,30 @@ liens:
     href: "https://www.linkedin.com/in/exemple"
   - libelle: "GitHub"
     href: "https://github.com/exemple"
+formulaire:
+  bouton: "Envoyer"
+  message_repli: "Le formulaire n'est pas actif. Écrivez à test@exemple.invalid."
+  champs:
+    - nom: nom
+      libelle: "Nom"
+      type: texte
+      requis: true
+      options: null
+    - nom: email
+      libelle: "Email"
+      type: email
+      requis: true
+      options: null
+    - nom: type-de-besoin
+      libelle: "Type de besoin"
+      type: liste
+      requis: false
+      options:
+        - "Cadrage"
+        - "Autre"
+    - nom: votre-situation
+      libelle: "Votre situation"
+      type: zone_texte
+      requis: true
+      options: null
 ---

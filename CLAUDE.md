@@ -25,6 +25,7 @@ Déploiement Vercel.
 | `rules/STACK.md` | Stack officielle, dépendances autorisées / interdites. |
 | `rules/ABOUT-ME.md` | Qui est l'auteur, **et la posture d'interaction attendue**. |
 | `rules/GIT.md` | Convention de commits. |
+| `rules/LANGUE.md` | Règles de langue de tout le contenu du site (pas d'emoji, pas de tiret long, langue parlée…). |
 
 ---
 
@@ -56,11 +57,13 @@ validation.
 - **Étape 5 — Accueil, à propos, contact + navigation.** ✅ `components/site-nav.tsx`
   (5 entrées, ordre imposé) + `site-footer.tsx` dans le layout. Contenu des pages en
   `content/pages/*.mdx` (schémas `lib/pages-frontmatter.ts`, lecture `lib/contenu-pages.ts`,
-  briques communes `lib/schema-commun.ts`). Accueil : hero / problème / aperçu offres /
-  preuve chiffrée / réalisations mises en avant (disparaît si aucune) / démarche / CTA —
-  offres et réalisations lues en direct, jamais recopiées (ADR-016). Contact : formulaire
-  Web3Forms qui dégrade si la clé manque, e-mail + LinkedIn + GitHub toujours visibles
-  (ADR-017). Textes en `TODO —`, en attente du contenu de l'auteur.
+  briques communes `lib/schema-commun.ts`). **Contenu éditorial définitif intégré.**
+  Accueil : hero / problème / aperçu offres / preuve chiffrée (4 chiffres) / réalisations
+  mises en avant (disparaît si aucune) / démarche / CTA — offres et réalisations lues en
+  direct, jamais recopiées (ADR-016). Contact : formulaire **piloté par le contenu**
+  (`contact.mdx` décrit les champs), Web3Forms, dégrade si la clé manque (ADR-017).
+  Reste 5 `[VÉRIFIER]` à confirmer avant mise en ligne (voir rapport d'étape).
+  Règles de langue du site : `rules/LANGUE.md` (ADR-018).
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
 
 ---
@@ -70,19 +73,22 @@ validation.
 1. **N'invente aucun contenu éditorial.** Les textes des projets, de l'accueil et des
    offres sont fournis par l'auteur. Là où un texte manque, mettre un contenu de
    remplacement explicitement marqué `TODO —` (impossible à publier par inadvertance).
-2. **Procède par étapes, avec un point d'arrêt à la fin de chacune.**
-3. **Aucune dépendance ajoutée sans justification.** En cas de besoin, demander d'abord.
-4. **Si une information manque, arrête-toi et demande.** Ne pas combler par une
+   Une valeur à confirmer par l'auteur se marque `[VÉRIFIER : …]`.
+2. **Langue : voir `rules/LANGUE.md`.** Tout texte produit par l'agent (libellés,
+   messages, placeholders) suit les 7 règles. Le contenu livré n'est pas réécrit.
+3. **Procède par étapes, avec un point d'arrêt à la fin de chacune.**
+4. **Aucune dépendance ajoutée sans justification.** En cas de besoin, demander d'abord.
+5. **Si une information manque, arrête-toi et demande.** Ne pas combler par une
    supposition plausible.
-5. **Posture d'interaction : voir `rules/ABOUT-ME.md`.** Non complaisant, nuancé,
+6. **Posture d'interaction : voir `rules/ABOUT-ME.md`.** Non complaisant, nuancé,
    challenge les hypothèses, présente les compromis. Pas de validation réflexe.
-6. **Commits : voir `rules/GIT.md`.** Français, orientés métier, regroupés par
+7. **Commits : voir `rules/GIT.md`.** Français, orientés métier, regroupés par
    fonctionnalité (jamais par fichier). Un commit = une évolution cohérente.
-7. **Stack : voir `rules/STACK.md`.** Par défaut : simplicité, pas d'abstraction
+8. **Stack : voir `rules/STACK.md`.** Par défaut : simplicité, pas d'abstraction
    prématurée.
-8. **Anti-duplication.** Une info qui existe déjà se référence, ne se recopie pas.
+9. **Anti-duplication.** Une info qui existe déjà se référence, ne se recopie pas.
    Toute divergence entre deux fichiers est un bug de documentation.
-9. **Décisions structurantes** consignées dans `docs/DECISIONS.md`, format ADR court :
+10. **Décisions structurantes** consignées dans `docs/DECISIONS.md`, format ADR court :
    contexte, décision, conséquences.
 
 ---

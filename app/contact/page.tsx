@@ -24,11 +24,14 @@ export default function ContactPage() {
 
       <div className="mt-8">
         {CLE_FORMULAIRE_CONTACT ? (
-          <ContactFormulaire cleAcces={CLE_FORMULAIRE_CONTACT} />
+          <ContactFormulaire
+            cleAcces={CLE_FORMULAIRE_CONTACT}
+            champs={c.formulaire.champs}
+            bouton={c.formulaire.bouton}
+          />
         ) : (
           <p className="rounded-md border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
-            Le formulaire n&apos;est pas encore configuré. Écrivez-moi directement à
-            l&apos;adresse ci-dessous.
+            {c.formulaire.message_repli}
           </p>
         )}
       </div>

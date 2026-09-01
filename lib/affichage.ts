@@ -26,13 +26,14 @@ export function capitaliser(texte: string): string {
 /**
  * Période d'une mission.
  *  - `fin === null` (mission en cours) → "Depuis avril 2026"
- *  - sinon                            → "Avril 2026 – juin 2026"
- * Jamais de tiret orphelin ni de borne vide.
+ *  - sinon                            → "Avril 2026 à juin 2026"
+ * Jamais de tiret orphelin ni de borne vide. Pas de tiret long
+ * (règle de langue du site) : on écrit « à ».
  */
 export function formatPeriode(debut: string, fin: string | null): string {
   const d = formatMoisAnnee(debut)
   if (fin === null) return `Depuis ${d}`
-  return `${capitaliser(d)} – ${formatMoisAnnee(fin)}`
+  return `${capitaliser(d)} à ${formatMoisAnnee(fin)}`
 }
 
 /**

@@ -158,21 +158,28 @@ la réalisation n'est recopiée dans le frontmatter de l'offre — anti-duplicat
 Un fichier par page dans `content/pages/` (`accueil.mdx`, `a-propos.mdx`,
 `contact.mdx`), frontmatter seul, validé par zod (`lib/pages-frontmatter.ts`,
 lecture `lib/contenu-pages.ts`). Briques de schéma communes dans
-`lib/schema-commun.ts` (`SLUG`, `lien()`, `lienNommeSchema`, `sectionTexteSchema`).
+`lib/schema-commun.ts` (`SLUG`, `lien()`, `lienNommeSchema`, `sectionTexteSchema`,
+`blocSchema`). Chaque page a un schéma dédié, structure figée (pas de corps MDX).
 
-- **Accueil** : hero, « le problème traité », aperçu des trois offres, une preuve
-  chiffrée, réalisations mises en avant, la démarche, appel à l'action.
+- **Accueil** : `hero` (titre, sous-titre, disponibilité, deux boutons),
+  `probleme` (`blocs[]` intitulé + phrase), `apercu_offres` (intitulé + texte +
+  libellé de lien), `preuve` (`entrees[]` `{ chiffre, libelle, detail }`),
+  `apercu_realisations`, `demarche` (paragraphes + libellé de lien), `cta`.
   Il ne stocke **que son propre texte** + les intitulés des blocs d'aperçu. Les
   offres viennent de `getOffresPubliees()`, les réalisations de
   `getRealisationsMisesEnAvant()` — titres et résumés lus en direct, **jamais
   recopiés**. Le bloc réalisations n'est rendu que si la liste n'est pas vide :
   sans fiche publiée (état actuel), il **disparaît** — ni grille vide, ni message.
-- **À propos** : `titre`, `intro[]`, `sections[]` (`{ titre, paragraphes[] }`).
-- **Contact** : `titre`, `intro[]`, `email`, `liens[]` (LinkedIn, GitHub).
-  Formulaire via **Web3Forms**, clé `NEXT_PUBLIC_WEB3FORMS_KEY`. Absente au build →
-  le formulaire n'est pas rendu, l'e-mail (`mailto:`) et les liens restent
-  affichés (`app/contact/page.tsx` + `components/contact-formulaire.tsx`). L'appel
-  réseau n'a lieu qu'à la soumission.
+- **À propos** : `titre` (le nom, `<h1>`), `sous_titre`, `photo` (nullable),
+  `ce_que_je_fais` / `ce_que_je_ne_fais_pas` (prose), `comment_je_travaille` /
+  `competences` (`blocs[]`), `parcours` (`items[]` en liste), `cta` (texte + liens).
+- **Contact** : `titre`, `intro[]`, `email`, `liens[]` (LinkedIn, GitHub),
+  `formulaire` : `champs[]` (`{ nom, libelle, type, requis, options }` —
+  types `texte` / `email` / `liste` / `zone_texte`), `bouton`, `message_repli`.
+  Le formulaire est **piloté par le contenu** : `ContactFormulaire` rend les champs
+  décrits dans `contact.mdx` (ADR-019). Envoi via **Web3Forms**, clé
+  `NEXT_PUBLIC_WEB3FORMS_KEY`. Absente au build → formulaire non rendu,
+  `message_repli` + e-mail (`mailto:`) + liens affichés. Requête à la soumission.
 
 ### Navigation
 

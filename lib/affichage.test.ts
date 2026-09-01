@@ -33,11 +33,14 @@ describe("formatPeriode — pas de borne vide ni de tiret orphelin", () => {
   it("mission en cours (fin: null) → 'Depuis <mois année>'", () => {
     expect(formatPeriode("2026-04", null)).toBe("Depuis avril 2026")
   })
-  it("mission terminée → '<Mois année> – <mois année>'", () => {
-    expect(formatPeriode("2026-01", "2026-06")).toBe("Janvier 2026 – juin 2026")
+  it("mission terminée → '<Mois année> à <mois année>'", () => {
+    expect(formatPeriode("2026-01", "2026-06")).toBe("Janvier 2026 à juin 2026")
   })
-  it("ne contient jamais un tiret suivi de rien", () => {
-    expect(formatPeriode("2026-04", null)).not.toMatch(/[–-]\s*$/)
+  it("n'utilise pas de tiret long (règle de langue du site)", () => {
+    expect(formatPeriode("2026-01", "2026-06")).not.toMatch(/[–—]/)
+  })
+  it("ne contient jamais une borne suivie de rien", () => {
+    expect(formatPeriode("2026-04", null)).not.toMatch(/(à|depuis)\s*$/i)
   })
 })
 
