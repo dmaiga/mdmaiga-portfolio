@@ -50,7 +50,7 @@ export default async function FichePage({ params }: Params) {
         <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-xl bg-muted">
           <Image
             src={fm.image_couverture}
-            alt=""
+            alt={fm.alt_couverture ?? ""}
             fill
             sizes="(max-width: 768px) 100vw, 42rem"
             className="object-cover"

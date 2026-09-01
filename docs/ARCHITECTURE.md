@@ -48,12 +48,13 @@ Une réalisation = un fichier `content/realisations/<slug>.mdx`.
 | `production_depuis` | date `YYYY-MM` \| null | |
 | `fin` | date `YYYY-MM` \| null | `null` = mission en cours |
 | `utilisateurs` | string | |
-| `technologies` | string[] | |
+| `technologies` | string[] | peut être vide (`[]`) |
 | `mis_en_avant` | boolean | apparaît sur l'accueil |
 | `brouillon` | boolean | `true` = exclu du build, de l'index, de l'accueil, du sitemap |
 | `ordre` | number | tri manuel dans l'index |
-| `lien_demo` | string \| null | optionnel |
+| `lien_demo` | string \| null | URL absolue ou `null` |
 | `image_couverture` | string \| null | chemin relatif, `public/realisations/<slug>.<ext>`, ≤ 300 Ko |
+| `alt_couverture` | string \| null \| _absent_ | **seule clé facultative** ; texte alternatif de la couverture. Absent/`null` → `alt=""` (décorative). À renseigner pour une capture d'interface. |
 
 ### Corps MDX — deux couches
 

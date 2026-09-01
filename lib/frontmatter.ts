@@ -47,6 +47,11 @@ export const frontmatterSchema = z
       .refine((v) => URL.canParse(v), "URL absolue attendue")
       .nullable(),
     image_couverture: z.string().min(1).nullable(),
+    // Texte alternatif de la couverture. Les captures d'interface portent de
+    // l'information → renseigner. Absent ou null → alt="" (image décorative).
+    // Seule clé du frontmatter réellement facultative : elle n'a de sens
+    // qu'avec `image_couverture` (voir docs/DECISIONS.md ADR-013).
+    alt_couverture: z.string().min(1).nullish(),
   })
   .strict()
 

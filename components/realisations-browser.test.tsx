@@ -44,4 +44,10 @@ describe("RealisationsBrowser — dégradation propre du filtre client", () => {
     // beta est de type `decisionnel` → libellé canonique attendu
     expect(html).toContain("Pilotage et décisionnel")
   })
+
+  it("la couverture porte le texte alternatif `alt_couverture` quand il est renseigné", () => {
+    const alpha = publiees.find((r) => r.slug === "alpha")!
+    expect(alpha.alt_couverture).toBeTruthy()
+    expect(html).toContain(`alt="${alpha.alt_couverture}"`)
+  })
 })

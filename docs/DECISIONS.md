@@ -160,3 +160,7 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   et un rendu de contrôle au build.
 - **Alternatives écartées.** Clés omises + `z.optional()` : rend le gabarit de fiche
   truffé de `?.` et le modèle de contenu moins lisible pour l'auteur.
+- **Exception — `alt_couverture`.** Seule clé réellement facultative (peut être
+  absente). Elle n'a de sens qu'avec `image_couverture` ; l'imposer partout
+  n'apporterait rien. Absente ou `null` → `alt=""` (couverture décorative) ;
+  renseignée → texte alternatif porteur d'information (captures d'interface).

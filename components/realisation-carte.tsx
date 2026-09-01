@@ -21,7 +21,7 @@ export function RealisationCarte({ realisation: r }: { realisation: Frontmatter 
         <div className="relative mb-3 aspect-[16/9] overflow-hidden rounded-lg bg-muted">
           <Image
             src={r.image_couverture}
-            alt=""
+            alt={r.alt_couverture ?? ""}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover"
