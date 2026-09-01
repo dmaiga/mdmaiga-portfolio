@@ -73,6 +73,24 @@ Une réalisation = un fichier `content/realisations/<slug>.mdx`.
 `<Approfondir>` : bloc **replié par défaut**, dépliable au clic. `<details>` natif ou
 disclosure accessible (clavier, `aria-expanded`), sans dépendance lourde.
 
+### Chaîne de lecture (`lib/`)
+
+| Module | Rôle |
+|---|---|
+| `lib/frontmatter.ts` | schéma zod strict (`.strict()`), `Frontmatter` inféré ; rejette clé inconnue, `type`/`cadre` hors taxonomie, date hors `AAAA-MM`, `technologies` vide |
+| `lib/realisations.ts` | lecture `fs` de `content/realisations/*.mdx`, `gray-matter`, validation, contrôle `slug === nom de fichier` |
+
+API publique (toutes filtrent les brouillons, sauf la première) :
+
+- `_lireFichesBrouillonsComprises()` — tout, réservé aux tests/outillage ;
+- `getRealisationsPubliees()` — publiables, triées par `ordre` croissant ;
+- `getRealisation(slug)` — `null` si absente **ou** brouillon (→ 404) ;
+- `getSlugsPublies()` — pour `generateStaticParams` ;
+- `getRealisationsMisesEnAvant()` — publiables **et** `mis_en_avant`.
+
+Le paramètre `dossier` optionnel de ces fonctions est un point d'entrée de test
+(fixtures) ; le code applicatif les appelle sans argument.
+
 ## 4. Taxonomie
 
 Source **unique** : `lib/taxonomie.ts`. Aucune recopie ailleurs, y compris dans la

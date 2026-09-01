@@ -35,8 +35,12 @@ Construction initiale par étapes (brief de bootstrap). Chaque étape se termine
 validation.
 
 - **Étape 1 — Squelette.** ✅ init projet, structure, config TS + lint, `docs/`.
-- Étape 2 — Chaîne de contenu (lecture MDX, schéma zod, brouillon, tri, taxonomie, fiche d'exemple `TODO`).
-- Étape 3 — Réalisations (index filtrable + gabarit de fiche, bloc `<Approfondir>`).
+- **Étape 2 — Chaîne de contenu.** ✅ lecture MDX (`lib/realisations.ts`), schéma zod strict
+  (`lib/frontmatter.ts`), taxonomie source unique (`lib/taxonomie.ts`), filtre brouillon + tri,
+  fiche modèle `content/realisations/exemple-modele.mdx` (`brouillon: true`), tests Vitest
+  (`lib/realisations.test.ts`) — le filtre brouillon est le garde-fou central (ADR-005).
+- Étape 3 — Réalisations (index filtrable + gabarit de fiche, bloc `<Approfondir>`,
+  compilation MDX via `next-mdx-remote` + `remark-gfm`).
 - Étape 4 — Offres (gabarit répété trois fois).
 - Étape 5 — Accueil, à propos, contact.
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
