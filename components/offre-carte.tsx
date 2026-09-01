@@ -1,7 +1,7 @@
 import Link from "next/link"
 import type { Offre } from "@/lib/offre-frontmatter"
 import type { DejaFaitAffiche } from "@/lib/offres"
-import { estLienExterne } from "@/lib/affichage"
+import { Lien } from "@/components/lien"
 
 /**
  * Gabarit d'offre — UN composant, rendu trois fois avec trois jeux de données
@@ -80,15 +80,12 @@ export function OffreCarte({ offre, dejaFait }: { offre: Offre; dejaFait: DejaFa
       )}
 
       <div className="mt-auto pt-6">
-        <a
+        <Lien
           href={offre.cta_lien}
-          {...(estLienExterne(offre.cta_lien)
-            ? { target: "_blank", rel: "noopener noreferrer" }
-            : {})}
           className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
           {offre.cta_libelle}
-        </a>
+        </Lien>
       </div>
     </article>
   )

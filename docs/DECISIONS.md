@@ -208,3 +208,38 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
   0 occurrence de « Voir la réalisation », 0 `href="/realisations/…"`, build vert.
 - **Alternatives écartées.** Recopier titre/lien de la réalisation dans le
   frontmatter de l'offre : viole l'anti-duplication ; casse au renommage.
+
+## ADR-016 — Pages fixes : contenu en frontmatter, aperçus lus en direct
+*2026-09-01 · Acté*
+- **Décision.** Accueil, à propos et contact ont chacun un fichier
+  `content/pages/<page>.mdx` (frontmatter seul, schéma zod dédié dans
+  `lib/pages-frontmatter.ts`). Briques communes factorisées dans
+  `lib/schema-commun.ts` (`SLUG`, `lien()`, `lienNommeSchema`, `sectionTexteSchema`),
+  désormais partagées avec `frontmatter.ts` et `offre-frontmatter.ts`.
+- **Anti-duplication (accueil).** L'accueil ne stocke que son texte propre et les
+  **intitulés** des blocs d'aperçu. Les trois offres et les réalisations mises en
+  avant sont lues via `getOffresPubliees()` / `getRealisationsMisesEnAvant()` —
+  les mêmes fonctions que `/offres` et `/realisations`. Titres et résumés ne sont
+  jamais recopiés dans `content/pages/accueil.mdx`.
+- **Dégradation.** Le bloc « réalisations mises en avant » n'est rendu que si la
+  liste est non vide. Sans fiche publiée (état actuel, durable), il disparaît :
+  ni grille vide, ni message d'erreur. Vérifié sur le HTML généré.
+- **Alternatives écartées.** Un corps MDX par page : ces pages ont une structure
+  fixe (hero, preuve chiffrée, etc.), le frontmatter structuré est plus sûr à
+  éditer et permet de valider chaque bloc.
+
+## ADR-017 — Formulaire de contact : Web3Forms, dégradation sur clé absente
+*2026-09-01 · Acté*
+- **Décision.** Formulaire de contact via **Web3Forms** (POST client à la
+  soumission, aucun appel au build). Clé publique dans `NEXT_PUBLIC_WEB3FORMS_KEY`,
+  exposée par `lib/site.ts` (`CLE_FORMULAIRE_CONTACT`, `null` si absente).
+- **Dégradation.** Clé absente au build → `app/contact/page.tsx` ne rend pas
+  `<ContactFormulaire>` mais un court message ; l'e-mail (`mailto:`) et les liens
+  LinkedIn / GitHub restent affichés et utilisables. Vérifié par deux builds de
+  contrôle (avec et sans `NEXT_PUBLIC_WEB3FORMS_KEY`).
+- **Pourquoi Web3Forms plutôt que Formspree.** Modèle « clé d'accès publique en
+  paramètre » qui colle à la contrainte « clé en variable d'environnement » ;
+  Formspree encode l'identifiant dans l'URL du endpoint. Choix réversible (une
+  seule fonction de soumission).
+- **Alternatives écartées.** `mailto:` seul (déjà écarté ADR-008) ; backend dédié
+  (réintroduit un serveur — ADR-002).

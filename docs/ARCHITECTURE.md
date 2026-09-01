@@ -153,50 +153,79 @@ la réalisation n'est recopiée dans le frontmatter de l'offre — anti-duplicat
 | `components/offre-carte.tsx` | gabarit unique, rendu trois fois par `app/offres/page.tsx` |
 | `components/bloc-page.tsx` | composant unique des trois blocs de page (`niveauTitre` h1/h2) |
 
-## 5. Taxonomie
+## 5. Modèle de contenu — Pages fixes (accueil, à propos, contact)
+
+Un fichier par page dans `content/pages/` (`accueil.mdx`, `a-propos.mdx`,
+`contact.mdx`), frontmatter seul, validé par zod (`lib/pages-frontmatter.ts`,
+lecture `lib/contenu-pages.ts`). Briques de schéma communes dans
+`lib/schema-commun.ts` (`SLUG`, `lien()`, `lienNommeSchema`, `sectionTexteSchema`).
+
+- **Accueil** : hero, « le problème traité », aperçu des trois offres, une preuve
+  chiffrée, réalisations mises en avant, la démarche, appel à l'action.
+  Il ne stocke **que son propre texte** + les intitulés des blocs d'aperçu. Les
+  offres viennent de `getOffresPubliees()`, les réalisations de
+  `getRealisationsMisesEnAvant()` — titres et résumés lus en direct, **jamais
+  recopiés**. Le bloc réalisations n'est rendu que si la liste n'est pas vide :
+  sans fiche publiée (état actuel), il **disparaît** — ni grille vide, ni message.
+- **À propos** : `titre`, `intro[]`, `sections[]` (`{ titre, paragraphes[] }`).
+- **Contact** : `titre`, `intro[]`, `email`, `liens[]` (LinkedIn, GitHub).
+  Formulaire via **Web3Forms**, clé `NEXT_PUBLIC_WEB3FORMS_KEY`. Absente au build →
+  le formulaire n'est pas rendu, l'e-mail (`mailto:`) et les liens restent
+  affichés (`app/contact/page.tsx` + `components/contact-formulaire.tsx`). L'appel
+  réseau n'a lieu qu'à la soumission.
+
+### Navigation
+
+`components/site-nav.tsx` (client, `usePathname` pour `aria-current`) dans le
+layout : cinq entrées, ordre fixe **Accueil · Offres · Réalisations · À propos ·
+Contact**. `components/site-footer.tsx` : nom + lien contact.
+
+## 6. Taxonomie
 
 Source **unique** : `lib/taxonomie.ts`. Aucune recopie ailleurs, y compris dans la
 génération d'images Open Graph. Deux dimensions — voir `docs/DECISIONS.md` ADR-006.
 
-## 6. Rendu & build
+## 7. Rendu & build
 
 - Toutes les pages sont générées au build. `generateStaticParams` énumère les fiches
   **non brouillon** uniquement.
 - Aucune requête réseau au build. Aucune variable d'environnement obligatoire, hormis
-  `NEXT_PUBLIC_SITE_URL` (voir §9), qui a un repli explicite et signalé.
+  `NEXT_PUBLIC_SITE_URL` (voir §10), qui a un repli explicite et signalé.
 
-## 7. Métadonnées & Open Graph
+## 8. Métadonnées & Open Graph
 
 - Métadonnées sur **toutes** les pages, accueil compris.
 - Open Graph + image de partage **par page**. Les libellés de taxonomie affichés dans
   les images sont lus depuis `lib/taxonomie.ts`, jamais recopiés.
 - `metadataBase` dérive de `SITE_URL` (`lib/site.ts`).
 
-## 8. Sitemap & robots
+## 9. Sitemap & robots
 
 - `sitemap.ts` et `robots.ts` générés.
 - Les fiches `brouillon: true` sont **exclues** du sitemap.
 
-## 9. Variables d'environnement
+## 10. Variables d'environnement
 
 | Variable | Obligatoire | Défaut |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | non | `FALLBACK` dans `lib/site.ts`, avec `console.warn` si absente |
-| clé du service de formulaire | non (au build) | — ; requise au runtime pour l'envoi |
+| `NEXT_PUBLIC_WEB3FORMS_KEY` | non | `null` → formulaire de contact non rendu, e-mail affiché à la place |
 
-## 10. Performance (cible : mobile lente)
+## 11. Performance (cible : mobile lente)
 
 - Polices auto-hébergées (`next/font/local`, `public/fonts/`).
 - Images dimensionnées, `next/image`, refus de tout fichier > 300 Ko dans `public/`.
 - Aucune requête tierce bloquante.
 
-## 11. Accessibilité
+## 12. Accessibilité
 
 - Un seul `<h1>` par page, hiérarchie de titres respectée.
 - Textes alternatifs sur les images porteuses de sens.
 - Navigation clavier complète, y compris `<Approfondir>` et le filtre de l'index.
+- `SiteNav` : `<nav aria-label>`, `aria-current="page"` sur l'entrée active.
+- Formulaire de contact : `<label>` associé à chaque champ, statut en `aria-live`.
 
-## 12. Arborescence
+## 13. Arborescence
 
 ```
 portfolio-freelance/
@@ -205,6 +234,7 @@ portfolio-freelance/
 ├── content/realisations/    # fiches MDX
 ├── content/offres/                  # 3 offres
 ├── content/offres-blocs/            # en-tete, mission longue, bandeau de fin
+├── content/pages/                   # accueil, a-propos, contact
 ├── docs/                    # DECISIONS.md, ARCHITECTURE.md
 ├── lib/                     # site.ts, taxonomie.ts, chaîne de contenu
 ├── public/                  # fonts/, realisations/ (médias)

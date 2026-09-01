@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { SITE_URL } from "@/lib/site"
+import { SiteNav } from "@/components/site-nav"
+import { SiteFooter } from "@/components/site-footer"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -14,7 +16,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body>{children}</body>
+      <body className="flex min-h-screen flex-col">
+        <SiteNav />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   )
 }

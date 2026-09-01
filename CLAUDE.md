@@ -53,7 +53,14 @@ validation.
   si la fiche est publiée (ADR-015) — vérifié par build de contrôle sur les 4 slugs
   réels (1 brouillon, 3 inexistants) : 0 lien mort. Bloc « contrôle de paie »
   abandonné (absent du contenu définitif).
-- Étape 5 — Accueil, à propos, contact.
+- **Étape 5 — Accueil, à propos, contact + navigation.** ✅ `components/site-nav.tsx`
+  (5 entrées, ordre imposé) + `site-footer.tsx` dans le layout. Contenu des pages en
+  `content/pages/*.mdx` (schémas `lib/pages-frontmatter.ts`, lecture `lib/contenu-pages.ts`,
+  briques communes `lib/schema-commun.ts`). Accueil : hero / problème / aperçu offres /
+  preuve chiffrée / réalisations mises en avant (disparaît si aucune) / démarche / CTA —
+  offres et réalisations lues en direct, jamais recopiées (ADR-016). Contact : formulaire
+  Web3Forms qui dégrade si la clé manque, e-mail + LinkedIn + GitHub toujours visibles
+  (ADR-017). Textes en `TODO —`, en attente du contenu de l'auteur.
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
 
 ---

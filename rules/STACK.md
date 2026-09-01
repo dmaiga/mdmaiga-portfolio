@@ -58,8 +58,9 @@ Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépô
 
 ## Formulaire de contact
 
-* Service tiers (**Web3Forms** ou **Formspree**), clé publique en variable d'environnement.
-  Requête uniquement à la soumission. Voir `docs/DECISIONS.md` ADR-008.
+* **Web3Forms** (arbitré — ADR-017), clé publique `NEXT_PUBLIC_WEB3FORMS_KEY`.
+  Requête uniquement à la soumission. Clé absente → formulaire masqué, e-mail
+  et liens (LinkedIn, GitHub) toujours affichés.
 
 ## Tests
 
@@ -72,7 +73,9 @@ Composants `button` / `badge` : **code possédé**, à copier de l'ancien dépô
   5. helpers d'affichage des champs optionnels (`lib/affichage.ts`) ;
   6. filtre `brouillon` des offres ; `getBlocPage` (bloc absent/brouillon → `null`) ;
   7. `resolveDejaFait` — texte toujours affiché, lien seulement si la fiche est publiée
-     (référence absente ou en brouillon → texte seul, jamais de lien mort ni d'erreur).
+     (référence absente ou en brouillon → texte seul, jamais de lien mort ni d'erreur) ;
+  8. lecture + validation du contenu des pages fixes (`lib/contenu-pages.ts`) ;
+  9. `SiteNav` — cinq entrées, ordre imposé, `aria-current` unique sur la page active.
 * Pas de tests au-delà : pas de rendu pixel, pas de e2e.
 
 ## Intégration continue

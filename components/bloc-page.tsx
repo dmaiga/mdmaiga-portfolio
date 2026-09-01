@@ -1,6 +1,5 @@
-import Link from "next/link"
 import type { BlocPage } from "@/lib/offre-frontmatter"
-import { estLienExterne } from "@/lib/affichage"
+import { Lien } from "@/components/lien"
 
 /**
  * Bloc de page à emplacement fixe : en-tête de /offres, « Mission longue »,
@@ -45,34 +44,22 @@ export function BlocPageVue({
             </span>
           )}
           {bloc.email && (
-            <a
+            <Lien
               href={`mailto:${bloc.email}`}
               className="font-medium underline underline-offset-2 hover:text-brand"
             >
               {bloc.email}
-            </a>
+            </Lien>
           )}
-          {bloc.liens.map((l) =>
-            estLienExterne(l.href) ? (
-              <a
-                key={l.href}
-                href={l.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline underline-offset-2 hover:text-brand"
-              >
-                {l.libelle}
-              </a>
-            ) : (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="font-medium underline underline-offset-2 hover:text-brand"
-              >
-                {l.libelle}
-              </Link>
-            ),
-          )}
+          {bloc.liens.map((l) => (
+            <Lien
+              key={l.href}
+              href={l.href}
+              className="font-medium underline underline-offset-2 hover:text-brand"
+            >
+              {l.libelle}
+            </Lien>
+          ))}
         </div>
       )}
     </section>

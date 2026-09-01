@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { TYPES, CADRES, type TypeRealisation, type CadreRealisation } from "@/lib/taxonomie"
+import { SLUG } from "@/lib/schema-commun"
 
 /**
  * Schéma strict du frontmatter d'une fiche `content/realisations/<slug>.mdx`.
@@ -21,9 +22,7 @@ const cadreKeys = Object.keys(CADRES) as [CadreRealisation, ...CadreRealisation[
 
 export const frontmatterSchema = z
   .object({
-    slug: z
-      .string()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug en kebab-case (a-z, 0-9, tirets)"),
+    slug: z.string().regex(SLUG, "slug en kebab-case (a-z, 0-9, tirets)"),
     titre: z.string().min(1),
     resume: z.string().min(1),
     type: z.enum(typeKeys),

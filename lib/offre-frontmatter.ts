@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { SLUG, lien, lienNommeSchema } from "@/lib/schema-commun"
 
 /**
  * Schémas stricts du contenu de la page /offres — même logique que
@@ -8,14 +9,6 @@ import { z } from "zod"
  *  - `offreSchema`    : les trois offres principales (gabarit répété) ;
  *  - `blocPageSchema` : les blocs de page (en-tête, mission longue, bandeau de fin).
  */
-
-const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-/** Chemin relatif (`/contact`), `mailto:`, `tel:`, ou URL absolue. */
-function lienValide(v: string): boolean {
-  return v.startsWith("/") || v.startsWith("mailto:") || v.startsWith("tel:") || URL.canParse(v)
-}
-const lien = () => z.string().min(1).refine(lienValide, "lien invalide (/chemin, mailto:, tel: ou URL absolue)")
 
 /**
  * Un exemple « Déjà fait » d'une offre. `texte` est le contenu éditorial rédigé
@@ -70,7 +63,7 @@ export const blocPageSchema = z
       .min(1)
       .refine((v) => v.includes("@"), "adresse e-mail attendue")
       .nullable(),
-    liens: z.array(z.object({ libelle: z.string().min(1), href: lien() })),
+    liens: z.array(lienNommeSchema),
     brouillon: z.boolean(),
   })
   .strict()

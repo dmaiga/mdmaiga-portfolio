@@ -20,3 +20,11 @@ if (!process.env.NEXT_PUBLIC_SITE_URL) {
 }
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK
+
+/**
+ * Clé publique Web3Forms pour le formulaire de contact.
+ * Absente au build → le formulaire n'est pas rendu, l'e-mail reste affiché et
+ * cliquable (dégradation propre — voir `app/contact/page.tsx`).
+ */
+export const CLE_FORMULAIRE_CONTACT = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || null
+
