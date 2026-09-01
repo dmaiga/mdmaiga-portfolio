@@ -45,12 +45,14 @@ validation.
   natif (`components/approfondir.tsx`), rendu MDX via `next-mdx-remote/rsc` + `remark-gfm`
   (ADR-011), système de tokens `globals.css` porté. Tests : dégradation, `<Approfondir>`
   replié + indexable, chaîne MDX, helpers d'affichage.
-- **Étape 4 — Offres.** ✅ gabarit unique `components/offre-carte.tsx` rendu trois fois
-  (`app/offres/page.tsx`), contenu en frontmatter seul (`content/offres/`, ADR-014) —
-  aucun prix en dur, `content/offres-complementaires/` pour les deux blocs de bas de
-  page, bloc « Déjà fait » résolu par slug via `getRealisation` (ADR-015, jamais de
-  lien mort — vérifié par build de contrôle). Scaffolding `offre-1/2/3` + les deux
-  compléments en `brouillon: true`, `TODO —`, en attente du contenu de l'auteur.
+- **Étape 4 — Offres.** ✅ contenu éditorial définitif intégré. En-tête + 3 offres
+  (gabarit unique `components/offre-carte.tsx` rendu trois fois) + 2 blocs de page
+  (`components/bloc-page.tsx`, schéma unique). Contenu en frontmatter seul
+  (`content/offres/`, `content/offres-blocs/` — ADR-014), aucun montant/délai en dur.
+  « Déjà fait » : `deja_fait: {slug, texte}[]`, texte toujours affiché, lien seulement
+  si la fiche est publiée (ADR-015) — vérifié par build de contrôle sur les 4 slugs
+  réels (1 brouillon, 3 inexistants) : 0 lien mort. Bloc « contrôle de paie »
+  abandonné (absent du contenu définitif).
 - Étape 5 — Accueil, à propos, contact.
 - Étape 6 — Finition (métadonnées, sitemap, redirections, a11y, poids des pages).
 

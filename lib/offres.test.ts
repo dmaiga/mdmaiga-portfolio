@@ -2,26 +2,25 @@ import { fileURLToPath } from "node:url"
 import { describe, it, expect } from "vitest"
 import {
   getOffresPubliees,
-  getComplementsPublies,
+  getBlocPage,
   resolveDejaFait,
   _lireOffresBrouillonsCompris,
-  _lireComplementsBrouillonsCompris,
+  _lireBlocPageBrouillonCompris,
 } from "@/lib/offres"
 
 const dir = (nom: string) =>
   fileURLToPath(new URL(`./__fixtures__/${nom}`, import.meta.url))
 
 const OFFRES = dir("offres")
-const COMPLEMENTS = dir("offres-complementaires")
+const BLOCS = dir("offres-blocs")
 const REALISATIONS = dir("realisations")
 
 describe("offres — filtre brouillon", () => {
-  it("la fixture brouillon existe bien (sans quoi les assertions ne prouvent rien)", () => {
-    const tous = _lireOffresBrouillonsCompris(OFFRES).map((o) => o.slug)
-    expect(tous).toContain("zzz-en-brouillon")
+  it("la fixture brouillon existe bien", () => {
+    expect(_lireOffresBrouillonsCompris(OFFRES).map((o) => o.slug)).toContain("zzz-en-brouillon")
   })
 
-  it("exclue et triée par ordre croissant", () => {
+  it("exclue et triée par ordre croissant (ordre intentionnel)", () => {
     const slugs = getOffresPubliees(OFFRES).map((o) => o.slug)
     expect(slugs).not.toContain("zzz-en-brouillon")
     expect(slugs).toEqual(["beta", "alpha"])
@@ -36,40 +35,48 @@ describe("offres — validation du frontmatter", () => {
   })
 })
 
-describe("compléments de bas de page — filtre brouillon", () => {
-  it("exclus et triés par ordre croissant", () => {
-    const slugs = getComplementsPublies(COMPLEMENTS).map((c) => c.slug)
-    expect(slugs).not.toContain("zzz-en-brouillon")
-    expect(slugs).toEqual(["beta"])
+describe("blocs de page", () => {
+  it("un bloc publié est renvoyé", () => {
+    expect(getBlocPage("bloc-complet", BLOCS)?.titre).toBe("Bloc fixture complet")
+  })
+
+  it("un bloc en brouillon → null (masqué)", () => {
+    expect(_lireBlocPageBrouillonCompris("bloc-brouillon", BLOCS)?.brouillon).toBe(true)
+    expect(getBlocPage("bloc-brouillon", BLOCS)).toBeNull()
+  })
+
+  it("un bloc absent → null, sans erreur", () => {
+    expect(getBlocPage("bloc-inexistant", BLOCS)).toBeNull()
+  })
+
+  it("rejette un frontmatter invalide (paragraphes vide, e-mail sans @, href invalide)", () => {
+    expect(() => _lireBlocPageBrouillonCompris("casse", dir("offres-blocs-invalide"))).toThrow(
+      /Frontmatter invalide/,
+    )
   })
 })
 
-describe("compléments — validation du frontmatter", () => {
-  it("rejette un cta_libelle sans cta_lien (paire incohérente)", () => {
-    expect(() =>
-      _lireComplementsBrouillonsCompris(dir("offres-complementaires-invalide")),
-    ).toThrow(/Frontmatter invalide/)
-  })
-})
-
-describe("resolveDejaFait — jamais de lien mort, jamais d'erreur", () => {
-  it("pas de référence (slug null) → aucun bloc", () => {
-    expect(resolveDejaFait(null, REALISATIONS)).toBeNull()
+describe("resolveDejaFait — texte toujours affiché, lien conditionnel", () => {
+  it("liste vide → liste vide", () => {
+    expect(resolveDejaFait([], REALISATIONS)).toEqual([])
   })
 
-  it("réalisation publiée → bloc résolu avec titre et slug", () => {
-    expect(resolveDejaFait("alpha", REALISATIONS)).toEqual({
-      titre: "Fixture Alpha",
-      slug: "alpha",
-    })
+  it("réalisation publiée → texte conservé + lien vers la fiche", () => {
+    expect(resolveDejaFait([{ slug: "alpha", texte: "T" }], REALISATIONS)).toEqual([
+      { texte: "T", lien: "/realisations/alpha" },
+    ])
   })
 
-  it("réalisation en brouillon → le bloc disparaît silencieusement (pas de lien mort)", () => {
-    expect(resolveDejaFait("zzz-en-brouillon", REALISATIONS)).toBeNull()
+  it("réalisation en brouillon → texte conservé, lien null (pas de lien mort)", () => {
+    expect(
+      resolveDejaFait([{ slug: "zzz-en-brouillon", texte: "T" }], REALISATIONS),
+    ).toEqual([{ texte: "T", lien: null }])
   })
 
-  it("réalisation inexistante → le bloc disparaît silencieusement (pas d'erreur)", () => {
-    expect(resolveDejaFait("ce-slug-n-existe-pas", REALISATIONS)).toBeNull()
+  it("réalisation inexistante → texte conservé, lien null (pas d'erreur)", () => {
+    expect(
+      resolveDejaFait([{ slug: "ce-slug-n-existe-pas", texte: "T" }], REALISATIONS),
+    ).toEqual([{ texte: "T", lien: null }])
   })
 })
 
@@ -78,7 +85,10 @@ describe("contenu réel du dépôt", () => {
     expect(() => _lireOffresBrouillonsCompris()).not.toThrow()
   })
 
-  it("tous les compléments de content/offres-complementaires ont un frontmatter valide", () => {
-    expect(() => _lireComplementsBrouillonsCompris()).not.toThrow()
+  it("les trois blocs de content/offres-blocs ont un frontmatter valide", () => {
+    for (const slug of ["entete", "mission-longue-renfort-equipe", "bandeau-fin"]) {
+      expect(() => _lireBlocPageBrouillonCompris(slug)).not.toThrow()
+      expect(_lireBlocPageBrouillonCompris(slug)).not.toBeNull()
+    }
   })
 })

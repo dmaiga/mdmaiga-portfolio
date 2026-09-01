@@ -1,13 +1,12 @@
 import { z } from "zod"
 
 /**
- * Schémas stricts du contenu des offres — même logique que `lib/frontmatter.ts`
- * pour les réalisations : tout vit en frontmatter, rien n'est en dur dans le code
- * (prix compris), validation au build.
+ * Schémas stricts du contenu de la page /offres — même logique que
+ * `lib/frontmatter.ts` : tout vit en frontmatter, rien n'est en dur dans le
+ * code (montants et délais compris), validation au build.
  *
- * Deux modèles distincts :
- *  - `offreSchema`      : les trois offres principales (gabarit répété) ;
- *  - `complementSchema` : les blocs de bas de page (contrôle de paie, mission longue).
+ *  - `offreSchema`    : les trois offres principales (gabarit répété) ;
+ *  - `blocPageSchema` : les blocs de page (en-tête, mission longue, bandeau de fin).
  */
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -18,24 +17,33 @@ function lienValide(v: string): boolean {
 }
 const lien = () => z.string().min(1).refine(lienValide, "lien invalide (/chemin, mailto:, tel: ou URL absolue)")
 
+/**
+ * Un exemple « Déjà fait » d'une offre. `texte` est le contenu éditorial rédigé
+ * pour la page /offres — jamais dérivé de la fiche. `slug` désigne une
+ * réalisation : si elle existe et n'est pas en brouillon, un lien est ajouté ;
+ * sinon le texte s'affiche seul (voir `resolveDejaFait`).
+ */
+const dejaFaitItem = z.object({
+  slug: z.string().regex(SLUG, "slug en kebab-case"),
+  texte: z.string().min(1),
+})
+
 export const offreSchema = z
   .object({
     slug: z.string().regex(SLUG, "slug en kebab-case"),
     titre: z.string().min(1),
     accroche: z.string().min(1),
-    // Puces éditables une à une par l'auteur, sans toucher au composant.
     concerne_si: z.array(z.string().min(1)).min(1),
     obtenez: z.array(z.string().min(1)).min(1),
     // Rendu en <ol> : la numérotation vient du HTML, pas d'un champ "numéro".
     etapes: z.array(z.string().min(1)).min(1),
-    // Texte libre (jamais de montant en dur dans le code) : "2 à 4 semaines",
-    // "À partir de 500 000 FCFA", etc.
+    // Texte libre (jamais de montant en dur dans le code).
     delai: z.string().min(1),
     budget: z.string().min(1),
-    // Référence une réalisation par son slug. Résolue via lib/realisations.ts,
-    // qui renvoie `null` pour une fiche brouillon ou absente : le bloc « Déjà
-    // fait » disparaît alors sans lien mort ni erreur de build (ADR à consigner).
-    deja_fait_slug: z.string().min(1).nullable(),
+    // Bloc "Note" distinct en fin d'offre (rare). `null` = pas de note.
+    note: z.string().min(1).nullable(),
+    // Exemples "Déjà fait" (0..n). Chaque item : texte éditorial + slug de fiche.
+    deja_fait: z.array(dejaFaitItem),
     cta_libelle: z.string().min(1),
     cta_lien: lien(),
     ordre: z.number().int(),
@@ -44,21 +52,27 @@ export const offreSchema = z
   .strict()
 
 export type Offre = z.infer<typeof offreSchema>
+export type DejaFaitItem = z.infer<typeof dejaFaitItem>
 
-export const complementSchema = z
+/**
+ * Bloc de page à emplacement fixe (en-tête, mission longue, bandeau de fin).
+ * Schéma souple : `tarif`, `email` et `liens` sont facultatifs et combinés
+ * selon le bloc. Pas d'`ordre` — chaque bloc a une place dédiée dans la page.
+ */
+export const blocPageSchema = z
   .object({
     slug: z.string().regex(SLUG, "slug en kebab-case"),
     titre: z.string().min(1),
-    texte: z.string().min(1),
-    cta_libelle: z.string().min(1).nullable(),
-    cta_lien: lien().nullable(),
-    ordre: z.number().int(),
+    paragraphes: z.array(z.string().min(1)).min(1),
+    tarif: z.string().min(1).nullable(),
+    email: z
+      .string()
+      .min(1)
+      .refine((v) => v.includes("@"), "adresse e-mail attendue")
+      .nullable(),
+    liens: z.array(z.object({ libelle: z.string().min(1), href: lien() })),
     brouillon: z.boolean(),
   })
   .strict()
-  .refine((d) => (d.cta_libelle === null) === (d.cta_lien === null), {
-    message: "cta_libelle et cta_lien doivent être renseignés ensemble (ou tous les deux null)",
-    path: ["cta_lien"],
-  })
 
-export type Complement = z.infer<typeof complementSchema>
+export type BlocPage = z.infer<typeof blocPageSchema>

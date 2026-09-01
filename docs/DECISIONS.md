@@ -167,9 +167,15 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
 
 ## ADR-014 — Contenu des offres : frontmatter seul, sans corps MDX
 *2026-09-01 · Acté*
-- **Décision.** Chaque offre (`content/offres/<slug>.mdx`) et chaque bloc de bas de
-  page (`content/offres-complementaires/<slug>.mdx`) porte tout son contenu en
-  frontmatter (listes, texte court). Le corps du fichier n'est pas lu ni compilé.
+- **Décision.** Chaque offre (`content/offres/<slug>.mdx`) et chaque bloc de page
+  (`content/offres-blocs/<slug>.mdx` : en-tête, mission longue, bandeau de fin)
+  porte tout son contenu en frontmatter (listes, paragraphes courts). Le corps du
+  fichier n'est pas lu ni compilé.
+- **Révision (contenu réel reçu).** Le bloc « contrôle de paie » prévu à l'étape 4
+  ne figure pas dans le contenu définitif — scaffold supprimé. Trois blocs de page
+  partagent un schéma unique `blocPageSchema` (`paragraphes[]`, `tarif`, `email`,
+  `liens[]`), chacun appelé par un slug fixe. `content/offres-complementaires/`
+  renommé `content/offres-blocs/`.
 - **Pourquoi.** Contrairement à une réalisation, une offre n'a pas de récit en
   prose libre : c'est une fiche technique (accroche, critères, livrables, étapes,
   délai, budget). La représenter en listes de frontmatter la rend éditable puce
@@ -183,17 +189,22 @@ Ce dépôt (`portfolio-freelance`) est neuf. Les ADR de l'ancien portfolio
 - **Prix.** Toujours en texte libre dans le frontmatter (`delai`, `budget`),
   jamais en dur dans un composant — ils changeront.
 
-## ADR-015 — Bloc « Déjà fait » : référence par slug, résolution silencieuse
-*2026-09-01 · Acté*
-- **Décision.** Une offre référence au plus une réalisation via `deja_fait_slug`.
-  `resolveDejaFait()` (`lib/offres.ts`) appelle `getRealisation()` — qui renvoie déjà
-  `null` pour une fiche absente ou en brouillon — et ne recopie aucune donnée de la
-  réalisation dans le frontmatter de l'offre (le titre est lu en direct au rendu).
-  `null` → le bloc ne s'affiche pas ; jamais de lien mort, jamais d'erreur de build.
-- **Pourquoi.** Toutes les réalisations sont en brouillon aujourd'hui (saisie
-  progressive — ADR-005) : c'est le cas normal, pas une exception à gérer au cas
-  par cas dans chaque composant qui référence une fiche.
-- **Vérifié.** Build de contrôle avec une offre publiée référençant `netsup`
-  (réellement en brouillon dans le dépôt) : build réussi, bloc absent du HTML.
-- **Alternatives écartées.** Dupliquer titre/lien dans le frontmatter de l'offre :
-  viole l'anti-duplication, désynchronisable si la réalisation est renommée.
+## ADR-015 — Bloc « Déjà fait » : texte éditorial + lien conditionnel
+*2026-09-01 · Acté (révisé sur contenu réel)*
+- **Décision.** Une offre porte `deja_fait: { slug, texte }[]` (0..n). Le `texte`
+  est du contenu éditorial rédigé pour la page /offres — **toujours affiché**.
+  `resolveDejaFait()` (`lib/offres.ts`) ajoute un lien vers `/realisations/<slug>`
+  **seulement si** `getRealisation(slug)` trouve une fiche publiée (il renvoie déjà
+  `null` pour une fiche absente **ou** en brouillon). Sinon : texte seul.
+- **Écart avec la première version.** Prévu au départ : `deja_fait_slug` unique,
+  bloc entièrement masqué si non résolu, titre tiré de la fiche. Le contenu réel
+  impose : plusieurs exemples par offre (l'offre 3 en a trois), chacun avec sa
+  propre description indépendante de la fiche, et le **texte reste visible** même
+  sans lien. Le schéma et la résolution ont été refaits en conséquence.
+- **Pourquoi.** Toutes les réalisations sont en brouillon aujourd'hui (ADR-005),
+  et trois des quatre slugs référencés (`dams-decisionnel`, `antares-rh`, `amee`)
+  n'existent pas encore comme fiches : c'est le cas normal, pas une exception.
+- **Vérifié.** Build de contrôle sur le contenu réel : `grep` du HTML généré →
+  0 occurrence de « Voir la réalisation », 0 `href="/realisations/…"`, build vert.
+- **Alternatives écartées.** Recopier titre/lien de la réalisation dans le
+  frontmatter de l'offre : viole l'anti-duplication ; casse au renommage.

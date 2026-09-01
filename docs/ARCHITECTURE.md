@@ -11,7 +11,7 @@ Les *décisions* et leurs compromis vivent dans `docs/DECISIONS.md` (non dupliqu
 - **Next.js (App Router, TypeScript)**, rendu **statique par défaut**, déployé sur **Vercel**.
 - **Aucun backend, aucune base de données, aucun appel API** au build ou au runtime.
 - Le contenu vit dans des fichiers **MDX versionnés** sous `content/realisations/`,
-  `content/offres/` et `content/offres-complementaires/`.
+  `content/offres/` et `content/offres-blocs/`.
 - Le build ne dépend d'aucun réseau (données locales, polices auto-hébergées).
 
 ## 2. Routes
@@ -19,7 +19,7 @@ Les *décisions* et leurs compromis vivent dans `docs/DECISIONS.md` (non dupliqu
 | Route | Contenu | Génération |
 |---|---|---|
 | `/` | Accueil | statique |
-| `/offres` | Trois offres (gabarit répété) + 2 blocs de bas de page | statique |
+| `/offres` | En-tête + 3 offres (gabarit répété) + 2 blocs de page | statique |
 | `/realisations` | Index filtrable par `type` | statique |
 | `/realisations/[slug]` | Fiche de cas, deux couches | `generateStaticParams` (hors brouillons) |
 | `/a-propos` | Démarche et parcours | statique |
@@ -105,12 +105,11 @@ Le paramètre `dossier` optionnel de ces fonctions est un point d'entrée de tes
 
 ## 4. Modèle de contenu — Offres
 
-Trois offres (`content/offres/<slug>.mdx`) + des blocs de bas de page distincts
-(`content/offres-complementaires/<slug>.mdx`). **Un seul composant** de gabarit
-(`components/offre-carte.tsx`), rendu une fois par offre — jamais trois blocs
-recopiés. Aucun contenu (prix compris) n'est en dur dans le code : tout vit dans
-le frontmatter, validé par zod au build. Pas de corps MDX en prose : le contenu
-d'une offre est entièrement structuré (listes, texte court), rien à compiler.
+La page `/offres` = **un en-tête** + **trois offres** (gabarit unique répété) +
+**deux blocs de page** (« Mission longue », bandeau de fin). Contenu dans
+`content/offres/<slug>.mdx` et `content/offres-blocs/<slug>.mdx`, validé par zod
+au build. **Aucun contenu (montants et délais compris) n'est en dur dans le
+code.** Pas de corps MDX : tout est structuré en frontmatter, rien à compiler.
 
 ### Frontmatter d'une offre
 
@@ -118,37 +117,41 @@ d'une offre est entièrement structuré (listes, texte court), rien à compiler.
 |---|---|---|
 | `slug` | string | doit correspondre au nom de fichier |
 | `titre`, `accroche` | string | |
-| `concerne_si` | string[] | « Vous êtes concerné·e si… », au moins un élément |
-| `obtenez` | string[] | « Ce que vous obtenez », au moins un élément |
-| `etapes` | string[] | « Comment ça se passe », rendu en `<ol>` (numérotation HTML) |
-| `delai`, `budget` | string | texte libre, jamais de montant en dur dans le code |
-| `deja_fait_slug` | string \| null | référence une fiche `content/realisations/` — voir résolution ci-dessous |
-| `cta_libelle`, `cta_lien` | string | bouton d'appel à l'action ; `cta_lien` : `/chemin`, `mailto:`, `tel:` ou URL absolue |
-| `ordre` | number | position parmi les trois offres |
+| `concerne_si`, `obtenez`, `etapes` | string[] | listes du gabarit ; `etapes` rendu en `<ol>` |
+| `delai`, `budget` | string | texte libre — jamais de montant en dur dans le code |
+| `note` | string \| null | bloc « Note » distinct en fin d'offre (rare) |
+| `deja_fait` | `{ slug, texte }[]` | 0..n exemples ; `texte` est éditorial (jamais dérivé de la fiche) |
+| `cta_libelle`, `cta_lien` | string | `cta_lien` : `/chemin`, `mailto:`, `tel:` ou URL absolue |
+| `ordre` | number | position parmi les trois offres (ordre **intentionnel**) |
 | `brouillon` | boolean | même garde-fou que les réalisations |
 
-### Frontmatter d'un bloc de bas de page
+### Frontmatter d'un bloc de page (`content/offres-blocs/`)
 
-`slug`, `titre`, `texte` (string), `cta_libelle`/`cta_lien` (tous deux `string` ou
-tous deux `null` — validé), `ordre`, `brouillon`.
+Schéma unique `blocPageSchema`, trois usages (en-tête, mission longue, bandeau de
+fin) : `slug`, `titre`, `paragraphes` (string[]), `tarif` (string | null),
+`email` (string | null, rendu en `mailto:`), `liens` (`{ libelle, href }[]`),
+`brouillon`. Pas d'`ordre` : chaque bloc a une place fixe dans la page, appelé par
+son slug (`entete`, `mission-longue-renfort-equipe`, `bandeau-fin`).
 
 ### Résolution « Déjà fait »
 
-`resolveDejaFait(slug)` (`lib/offres.ts`) appelle `getRealisation(slug)`, qui renvoie
-déjà `null` pour une fiche absente **ou en brouillon**. Dans les deux cas : `null`
-remonte, le composant n'affiche pas le bloc. **Aucun lien mort, aucune erreur de
-build** — vérifié par un build de contrôle (offre publiée référençant une fiche
-réellement en brouillon). Aucune donnée de la réalisation n'est recopiée dans le
-frontmatter de l'offre (titre lu en direct via la résolution) — anti-duplication.
+`resolveDejaFait(items)` (`lib/offres.ts`) : pour chaque item, le `texte` est
+**toujours** conservé (contenu éditorial de la page /offres) ; un lien vers
+`/realisations/<slug>` n'est ajouté **que si** `getRealisation(slug)` trouve une
+fiche publiée — il renvoie déjà `null` pour une fiche absente **ou en brouillon**.
+Résultat : texte affiché, lien absent quand la fiche n'est pas publiable. **Aucun
+lien mort, aucune erreur de build** — vérifié par un build de contrôle sur les
+quatre références réelles (une en brouillon, trois inexistantes). Aucune donnée de
+la réalisation n'est recopiée dans le frontmatter de l'offre — anti-duplication.
 
 ### Chaîne de lecture et rendu
 
 | Module / composant | Rôle |
 |---|---|
-| `lib/offre-frontmatter.ts` | schémas zod stricts `offreSchema` / `complementSchema` |
-| `lib/offres.ts` | lecture `fs`, validation, filtre brouillon, tri, `resolveDejaFait` |
+| `lib/offre-frontmatter.ts` | schémas zod stricts `offreSchema` / `blocPageSchema` |
+| `lib/offres.ts` | lecture `fs`, validation, filtre brouillon, tri, `getBlocPage`, `resolveDejaFait` |
 | `components/offre-carte.tsx` | gabarit unique, rendu trois fois par `app/offres/page.tsx` |
-| `components/bloc-complementaire.tsx` | bloc de bas de page, CTA optionnel |
+| `components/bloc-page.tsx` | composant unique des trois blocs de page (`niveauTitre` h1/h2) |
 
 ## 5. Taxonomie
 
@@ -201,7 +204,7 @@ portfolio-freelance/
 ├── components/              # composants partagés (+ ui/)
 ├── content/realisations/    # fiches MDX
 ├── content/offres/                  # 3 offres
-├── content/offres-complementaires/  # blocs de bas de page
+├── content/offres-blocs/            # en-tete, mission longue, bandeau de fin
 ├── docs/                    # DECISIONS.md, ARCHITECTURE.md
 ├── lib/                     # site.ts, taxonomie.ts, chaîne de contenu
 ├── public/                  # fonts/, realisations/ (médias)
